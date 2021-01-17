@@ -1,0 +1,14 @@
+{
+  "name": "liquicheck",
+  "version": "0.0.1",
+  "author": "Some authors",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "export LD_LIBRARY_PATH=./instantclient_21_1:$LD_LIBRARY_PATH && node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "oracledb": "^5.1.0"
+  }
+}
