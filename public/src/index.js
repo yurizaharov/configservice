@@ -1,8 +1,21 @@
 new Vue({
     el: "#app",
+    vuetify: new Vuetify(),
     data() {
         return {
-            patchesData: []
+            patchesData: [],
+            headers: [
+                {
+                    text: 'Database',
+                    align: 'start',
+                    sortable: false,
+                    value: 'database',
+                },
+                { text: 'Liquibase patch', value: 'id' },
+                { text: 'Exetuted date', value: 'dateexecuted' },
+                { text: 'Author', value: 'author' },
+                { text: 'Exec type', value: 'exectype' }
+            ],
         }
     },
 
