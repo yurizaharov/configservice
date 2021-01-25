@@ -1,5 +1,6 @@
 {
     "user": "bonus",
     "password": "bonus$",
-    "connectString":"192.168.4.150:1521/BONUS"
+    "connectString": "192.168.4.150:1521/BONUS",
+    "processing": "https://st-01.stage.bms.group/bps/bpsApi/ping"
 }

@@ -12,9 +12,10 @@ new Vue({
                     value: 'database',
                 },
                 { text: 'Liquibase patch', value: 'id' },
-                { text: 'Exetuted date', value: 'dateexecuted' },
+                { text: 'Executed date', value: 'dateexecuted' },
                 { text: 'Author', value: 'author' },
-                { text: 'Exec type', value: 'exectype' }
+                { text: 'Exec type', value: 'exectype' },
+                { text: 'Processing', value: 'processingversion' }
             ],
         }
     },

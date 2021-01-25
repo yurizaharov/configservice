@@ -9,7 +9,7 @@ function getconfigs() {
         let dataBase = arrayOfParts[0]
         let rawData = fs.readFileSync(configFolder+'/'+file);
         let Creds = JSON.parse(rawData);
-        accessCreds.push( {"dataBase" : dataBase, "user" : Creds.user, "password" : Creds.password, "connectString" : Creds.connectString} )
+        accessCreds.push( {"dataBase" : dataBase, "user" : Creds.user, "password" : Creds.password, "connectString" : Creds.connectString, "processing" : Creds.processing} )
     });
     return accessCreds;
 }
