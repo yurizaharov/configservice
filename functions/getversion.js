@@ -41,7 +41,7 @@ async function getversion(accessCreds) {
 
         let processingVersion;
         try {
-            processingVersion = await axios.get(accessCreds[k].processing)
+            processingVersion = await axios.get(accessCreds[k].processingExt+'bpsApi/ping/')
                 .then((response) => {
                     if (!response.data.String) {
                         return response.data.split(' ')[1];
