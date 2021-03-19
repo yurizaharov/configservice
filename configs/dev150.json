@@ -1,9 +1,0 @@
-{
-    "user" : "bonus",
-    "password" : "bonus$",
-    "connectString" : "192.168.4.150:1521/BONUS",
-    "processingExt" : "https://st-01.stage.bms.group/bps/",
-    "processingInt" : "http://192.168.4.242:8081/bps/",
-    "mobileExt" : "https://st-01.stage.bms.group/mobile/",
-    "mobileInt" : "http://192.168.4.242:8084/mobile/"
-}

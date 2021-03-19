@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const {getallconfigs} = require('../functions/app.js')
+const {getstatsenderconfigs} = require('../functions/app.js')
+const {getliquicheckconfigs} = require('../functions/app.js')
 
 const getversion = require('../functions/getversion.js');
 const getinitialdata = require('../functions/getinitialdata.js');
@@ -7,8 +10,9 @@ const getservicesdata = require('../functions/getservicesdata.js');
 
 router
     .use(function timeLog(req, res, next) {
-        if(req.url != "/ping") {
-            console.log(Date.now(), '-', req.connection.remoteAddress.split(':')[3], '-', req.url)
+        if(req.url !== "/ping") {
+            const currentDate = new Date().toLocaleString('ru-RU');
+            console.log (currentDate, '-', req.connection.remoteAddress.split(':')[3], '-', req.url)
         }
         next();
     })
@@ -16,7 +20,7 @@ router
     .get('/ping', function(req, res) {
         res
             .status(200)
-            .send('Liquicheck');
+            .send('ConfigService');
     })
 
     .get('/liqui', async (req, res) => {
@@ -33,6 +37,27 @@ router
         res
             .status(200)
             .send(servicesData);
+    })
+
+    .get('/api/configs/getall', async (req, res) => {
+        let result = await getallconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/liquicheck', async (req, res) => {
+        let result = await getliquicheckconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/statsender', async (req, res) => {
+        let result = await getstatsenderconfigs()
+        res
+            .status(200)
+            .send(result);
     })
 
 module.exports = router;
