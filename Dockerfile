@@ -1,6 +1,6 @@
 FROM node:14.15.4-buster-slim
 
-ADD . /webapp/liquicheck
+ADD . /webapp/configservice
 
 RUN set -eux; \
     apt update; \
@@ -10,12 +10,12 @@ RUN set -eux; \
     ln -s /usr/share/zoneinfo/Europe/Moscow /etc/localtime; \
     echo "Europe/Moscow" > /etc/timezone; \
     mkdir -p /opt/oracle; \
-    mv /webapp/liquicheck/instantclient_21_1 /opt/oracle/instantclient_21_1
+    mv /webapp/configservice/instantclient_21_1 /opt/oracle/instantclient_21_1
 
-RUN cd /webapp/liquicheck && npm i
+RUN cd /webapp/configservice && npm i
 
 EXPOSE 8080
 
-WORKDIR /webapp/liquicheck
+WORKDIR /webapp/configservice
 
 CMD ["npm","start"]

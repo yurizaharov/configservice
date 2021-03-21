@@ -33,7 +33,7 @@ module.exports = {
 
         const Total = mongoose.model('', configsSchema, 'configs');
 
-        result = await Total.find({ "test" : true }, function (err, doc){
+        result = await Total.find({}, function (err, doc){
 //        result = await Total.find( { "test" : true }, function (err, doc){
             if(err) return console.log(err);
         }).sort({ 'name' : 1 }).lean();

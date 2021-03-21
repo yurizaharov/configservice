@@ -3,6 +3,8 @@ const router = express.Router();
 const {getallconfigs} = require('../functions/app.js')
 const {getstatsenderconfigs} = require('../functions/app.js')
 const {getliquicheckconfigs} = require('../functions/app.js')
+const {getmobilebackconfigs} = require('../functions/app.js')
+const {getbeniobmsconfigs} = require('../functions/app.js')
 
 const getversion = require('../functions/getversion.js');
 const getinitialdata = require('../functions/getinitialdata.js');
@@ -55,6 +57,20 @@ router
 
     .get('/api/configs/statsender', async (req, res) => {
         let result = await getstatsenderconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/mobileback', async (req, res) => {
+        let result = await getmobilebackconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/beniobms', async (req, res) => {
+        let result = await getbeniobmsconfigs()
         res
             .status(200)
             .send(result);
