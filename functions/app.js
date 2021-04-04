@@ -62,11 +62,11 @@ module.exports = {
        return statSenderData;
     },
 
-    getmobilebackconfigs: async function () {
+    getmobilebackconfigs: async function (name) {
         let allConfigs = [];
         let mobileBackData = [];
 
-        allConfigs = await getall();
+        allConfigs = await getall(name);
 
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].mobile) {

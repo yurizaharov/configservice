@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const configsSchema = new Schema();
 
 // Setting variables
-mongoAddr = process.env.MONGO_ADDR || 'localhost'
+mongoAddr = process.env.MONGO_ADDR || '192.168.4.231'
 mongoDBS = process.env.MONGO_DBS || 'ConfigService'
 
 // Setting instance parameters
@@ -28,15 +28,21 @@ mongoose.connect(mongoUri, options);
 
 module.exports = {
 
-    getall: async function () {
+    getall: async function (name) {
         let result = [];
 
         const Total = mongoose.model('', configsSchema, 'configs');
 
-        result = await Total.find({}, function (err, doc){
-//        result = await Total.find( { "test" : true }, function (err, doc){
-            if(err) return console.log(err);
-        }).sort({ 'name' : 1 }).lean();
+        if (!name) {
+            result = await Total.find({}, function (err, doc){
+//            result = await Total.find( { "test" : true }, function (err, doc){
+                if(err) return console.log(err);
+            }).sort({ 'name' : 1 }).lean();
+        } else {
+            result = await Total.find({ 'name' : name }, function (err, doc){
+                if(err) return console.log(err);
+            }).lean();
+        }
 
         return result;
     },

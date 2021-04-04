@@ -9,6 +9,7 @@ const {getbeniobmsconfigs} = require('../functions/app.js')
 const getversion = require('../functions/getversion.js');
 const getinitialdata = require('../functions/getinitialdata.js');
 const getservicesdata = require('../functions/getservicesdata.js');
+//const getbeniobmsdata = require('../functions/getbeniobmsdata.js');
 
 router
     .use(function timeLog(req, res, next) {
@@ -41,6 +42,14 @@ router
             .send(servicesData);
     })
 
+    .get('/beniobms', async (req,res) => {
+        let initialData = await getinitialdata()
+        let beniobmsData= await getbeniobmsdata(initialData)
+        res
+            .status(200)
+            .send(beniobmsData);
+    })
+
     .get('/api/configs/getall', async (req, res) => {
         let result = await getallconfigs()
         res
@@ -64,6 +73,14 @@ router
 
     .get('/api/configs/mobileback', async (req, res) => {
         let result = await getmobilebackconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/mobileback/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await getmobilebackconfigs(name)
         res
             .status(200)
             .send(result);
