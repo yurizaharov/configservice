@@ -1,10 +1,8 @@
 const express = require('express');
+const jsonParser = express.json();
 const router = express.Router();
-const {getallconfigs} = require('../functions/app.js')
-const {getstatsenderconfigs} = require('../functions/app.js')
-const {getliquicheckconfigs} = require('../functions/app.js')
-const {getmobilebackconfigs} = require('../functions/app.js')
-const {getbeniobmsconfigs} = require('../functions/app.js')
+const methods = require('../functions/methods')
+const loyalty = require('../functions/loyalty')
 
 const getversion = require('../functions/getversion.js');
 const getinitialdata = require('../functions/getinitialdata.js');
@@ -51,28 +49,28 @@ router
     })
 
     .get('/api/configs/getall', async (req, res) => {
-        let result = await getallconfigs()
+        let result = await methods.getallconfigs()
         res
             .status(200)
             .send(result);
     })
 
     .get('/api/configs/liquicheck', async (req, res) => {
-        let result = await getliquicheckconfigs()
+        let result = await methods.getliquicheckconfigs()
         res
             .status(200)
             .send(result);
     })
 
     .get('/api/configs/statsender', async (req, res) => {
-        let result = await getstatsenderconfigs()
+        let result = await methods.getstatsenderconfigs()
         res
             .status(200)
             .send(result);
     })
 
     .get('/api/configs/mobileback', async (req, res) => {
-        let result = await getmobilebackconfigs()
+        let result = await methods.getmobilebackconfigs()
         res
             .status(200)
             .send(result);
@@ -80,17 +78,56 @@ router
 
     .get('/api/configs/mobileback/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await getmobilebackconfigs(name)
+        let result = await methods.getmobilebackconfigs(name)
         res
             .status(200)
             .send(result);
     })
 
     .get('/api/configs/beniobms', async (req, res) => {
-        let result = await getbeniobmsconfigs()
+        let result = await methods.getbeniobmsconfigs()
         res
             .status(200)
             .send(result);
     })
+
+    .get('/api/configs/beniobms/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getbeniobmsconfigs(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/database', async (req, res) => {
+        let result = await methods.getdatabaseconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/database/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getdatabaseconfigs(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .post("/api/loyalty/new", jsonParser, async function (req, res) {
+        if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
+
+        let sendResult = await loyalty.newpartner(req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        console.log(sendResult)
+
+        const resData = {
+            "code": 0,
+            "status": "success"
+        }
+        res
+            .status(200)
+            .send(resData);
+    })
+
 
 module.exports = router;

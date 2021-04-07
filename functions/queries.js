@@ -3,13 +3,22 @@ const Schema = mongoose.Schema;
 
 const configsSchema = new Schema();
 
+const partnerScheme = new Schema({
+    name: String,
+    colorPrimary: String,
+    colorAccent: String,
+    currentDate: String
+});
+
+const Partner = mongoose.model('Partner', partnerScheme, 'loyalty');
+
 // Setting variables
 mongoAddr = process.env.MONGO_ADDR || '192.168.4.231'
 mongoDBS = process.env.MONGO_DBS || 'ConfigService'
 
 // Setting instance parameters
-const mongoUri = "mongodb://" + mongoAddr + "/" + mongoDBS;
-console.log("MongoDB address set to:", mongoUri);
+const mongoUri = 'mongodb://' + mongoAddr + '/' + mongoDBS;
+console.log('MongoDB address set to:', mongoUri);
 
 // Setting mongoose parameters
 const options = {
@@ -26,9 +35,9 @@ const options = {
 
 mongoose.connect(mongoUri, options);
 
-module.exports = {
+const queries = {
 
-    getall: async function (name) {
+    async getall(name) {
         let result = [];
 
         const Total = mongoose.model('', configsSchema, 'configs');
@@ -47,16 +56,32 @@ module.exports = {
         return result;
     },
 
-    getstatsender: async function () {
+    async getstatsender() {
         let result = [];
 
         const Stats = mongoose.model('', configsSchema, 'configs');
 
-        result = await Stats.find({ "subscription" : false, "inProd" : true }, function (err, doc){
+        result = await Stats.find({ 'subscription' : false, 'inProd' : true }, function (err, doc){
             if(err) return console.log(err);
         }).sort({ 'name' : 1 }).lean();
 
         return result;
+    },
+
+    async newpartner (name, colorPrimary, colorAccent, currentDate) {
+        let partner = new Partner({
+            name: name,
+            colorPrimary: colorPrimary,
+            colorAccent: colorAccent,
+            currentDate: currentDate
+        });
+
+        partner.save(function (err, obj) {
+            if (err) return console.log(err);
+            console.log(currentDate, '- Saved new partner:', name);
+        });
     }
 
 }
+
+module.exports = queries;
