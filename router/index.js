@@ -129,5 +129,11 @@ router
             .send(resData);
     })
 
+    .get("/api/loyalty/checknew", async function (req, res) {
+        let result = await loyalty.getnewpartner()
+        res
+            .status(200)
+            .send(result);
+    })
 
 module.exports = router;

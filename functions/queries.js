@@ -80,6 +80,18 @@ const queries = {
             if (err) return console.log(err);
             console.log(currentDate, '- Saved new partner:', name);
         });
+    },
+
+    async getnewpartner() {
+        let result = [];
+
+        const Parners = mongoose.model('', configsSchema, 'loyalty');
+
+        result = await Parners.find({}, function (err, doc){
+            if(err) return console.log(err);
+        }).lean();
+
+        return result;
     }
 
 }
