@@ -3,11 +3,11 @@ const jsonParser = express.json();
 const router = express.Router();
 const methods = require('../functions/methods')
 const loyalty = require('../functions/loyalty')
+const version = require('../functions/version')
 
 const getversion = require('../functions/getversion.js');
 const getinitialdata = require('../functions/getinitialdata.js');
 const getservicesdata = require('../functions/getservicesdata.js');
-//const getbeniobmsdata = require('../functions/getbeniobmsdata.js');
 
 router
     .use(function timeLog(req, res, next) {
@@ -25,8 +25,15 @@ router
     })
 
     .get('/liqui', async (req, res) => {
-        let initialData = await getinitialdata()
-        let currentPatches = await getversion(initialData)
+        let initialData = await getinitialdata();
+        let currentPatches = await getversion(initialData);
+        res
+            .status(200)
+            .send(currentPatches)
+    })
+
+    .get('/liquibeniobms', async (req, res) => {
+        let currentPatches = await methods.liquibeniobms();
         res
             .status(200)
             .send(currentPatches)
@@ -38,14 +45,6 @@ router
         res
             .status(200)
             .send(servicesData);
-    })
-
-    .get('/beniobms', async (req,res) => {
-        let initialData = await getinitialdata()
-        let beniobmsData= await getbeniobmsdata(initialData)
-        res
-            .status(200)
-            .send(beniobmsData);
     })
 
     .get('/api/configs/getall', async (req, res) => {

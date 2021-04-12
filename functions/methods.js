@@ -1,4 +1,6 @@
-const queries = require('../functions/queries')
+const getpatch = require('../functions/getpatch.js');
+const queries = require('../functions/queries');
+const version = require('../functions/version');
 
 const methods = {
     async getallconfigs () {
@@ -149,7 +151,48 @@ const methods = {
             }
         }
         return beniobmsData;
-    }
+    },
+
+    async liquibeniobms () {
+        let beniobmsData = [];
+
+        let allConfigs = await queries.getall();
+
+        for (let k = 0; k < allConfigs.length; k++) {
+            let dataBase = allConfigs[k].name;
+
+            let currentPatch, beniobmsExt, beniobmsInt, beniobmsVersion;
+
+            if (allConfigs[k].database) {
+                currentPatch = await getpatch(allConfigs[k].database)
+            }
+
+            if (allConfigs[k].beniobms) {
+                let name = allConfigs[k].beniobms.name || allConfigs[k].dns.name;
+                let subdomain = allConfigs[k].beniobms.subdomain || allConfigs[k].dns.subdomain;
+                let domain = allConfigs[k].dns.domain;
+                let dns = name + '.' + subdomain + '.' + domain;
+
+                let beniobmsPlacement = allConfigs[k].beniobms.placement;
+                let beniobmsPort = allConfigs[k].beniobms.port;
+
+                beniobmsExt = 'https://' + dns + '/';
+                beniobmsInt = 'http://' + beniobmsPlacement + ':' + beniobmsPort + '/';
+
+                beniobmsVersion = await version.beniobms(beniobmsExt);
+            }
+
+
+            beniobmsData.push({
+                dataBase: dataBase,
+                id: currentPatch,
+                beniobmsExt: beniobmsExt,
+                beniobmsInt: beniobmsInt,
+                beniobmsVersion: beniobmsVersion
+            })
+        }
+        return beniobmsData;
+    },
 
 }
 
