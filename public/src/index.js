@@ -3,21 +3,7 @@ new Vue({
     vuetify: new Vuetify(),
     data() {
         return {
-//            patchesData: [],
             servicesData: [],
-//            headers: [
-//                {
-//                    text: 'Database',
-//                    align: 'start',
-//                    sortable: false,
-//                    value: 'database',
-//                },
-//                { text: 'Liquibase patch', value: 'id' },
-//                { text: 'Executed date', value: 'dateexecuted' },
-//                { text: 'Author', value: 'author' },
-//                { text: 'Exec type', value: 'exectype' },
-//                { text: 'Processing', value: '`processingversion`' }
-//            ],
             headers: [
                 {
                     text: 'Service',
@@ -37,24 +23,12 @@ new Vue({
     },
 
     created() {
-//        this.getPatchesData();
         this.getServicesData();
     },
 
     computed: {},
 
     methods: {
-
-        async getPatchesData () {
-            await fetch('/liqui')
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                this.patchesData = data;
-                console.log(data);
-                });
-        },
 
         async getServicesData () {
             await fetch('/info')
@@ -66,6 +40,50 @@ new Vue({
                     console.log(data);
                 });
         }
+    }
+})
 
-    },
-});
+new Vue({
+        el: "#benio",
+        vuetify: new Vuetify(),
+        data() {
+            return {
+                benioData: [],
+                headers: [
+                    {
+                        text: 'Service',
+                        align: 'start',
+                        sortable: false,
+                        value: 'dataBase',
+                    },
+                    { text: 'Liquibase patch', value: 'id' },
+                    { text: 'Version', value: 'beniobmsVersion' },
+                    { text: 'beniobms Ext', value: 'beniobmsExt' },
+                    { text: 'beniobms Int', value: 'beniobmsInt' }
+                ],
+
+            }
+        },
+
+        created() {
+            this.getBenioData();
+        },
+
+        computed: {},
+
+        methods: {
+
+            async getBenioData () {
+                await fetch('/liquibeniobms')
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+                        this.benioData = data;
+                        console.log(data);
+                    });
+            }
+
+        }
+
+    });

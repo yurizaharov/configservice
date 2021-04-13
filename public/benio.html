@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>beniobms</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script type="module" src="./src/index.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+    <div id="benio">
+        <v-data-table class="shadow"
+                dense
+                :headers="headers"
+                :items="benioData"
+                :items-per-page="50"
+                item-key="dataBase"
+                class="elevation-1"
+                loading
+                loading-text="Loading... Please wait"
+        ></v-data-table>
+    </div>
+</body>
+
+</html>
+
+<style>
+    #benio {
+        font-family: 'Avenir', Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-align: left;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 60px;
+    }
+    .shadow {
+        background: #f8f8f8;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        padding: 1px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        width: auto;
+    }
+</style>
