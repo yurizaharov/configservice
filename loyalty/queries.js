@@ -29,7 +29,7 @@ const queries = {
     async getnewpartner () {
         let result = [];
         const Partners = mongoose.model('Partners', partnerScheme, 'loyalty');
-        result = await Partners.find({}, function (err, doc){
+        result = await Partners.findOne({}, function (err, doc){
             if(err) return console.log(err);
         }).lean();
         return result;
