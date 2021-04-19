@@ -9,14 +9,14 @@ new Vue({
                     text: 'Service',
                     align: 'start',
                     sortable: false,
-                    value: 'database',
+                    value: 'dataBase',
                 },
                 { text: 'Liquibase patch', value: 'id' },
-                { text: 'Processing', value: 'processingversion' },
-                { text: 'BPS external', value: 'processingext' },
-                { text: 'BPS internal', value: 'processingint' },
-                { text: 'Mobile external', value: 'mobileext' },
-                { text: 'Mobile internal', value: 'mobileint' }
+                { text: 'Processing', value: 'processingVersion' },
+                { text: 'BPS external', value: 'processingExt' },
+                { text: 'BPS internal', value: 'processingInt' },
+                { text: 'Mobile external', value: 'mobileExt' },
+                { text: 'Mobile internal', value: 'mobileInt' }
             ],
 
         }
@@ -31,7 +31,7 @@ new Vue({
     methods: {
 
         async getServicesData () {
-            await fetch('/info')
+            await fetch('/liquiprocessing')
                 .then((response) => {
                     return response.json();
                 })
