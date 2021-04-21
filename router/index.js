@@ -112,4 +112,12 @@ router
             .send(result);
     })
 
+    .post("/api/loyalty/deployment", jsonParser, async function (req, res) {
+        if(!req.body || !req.body.stage || !req.body.name || !req.body.state) return res.sendStatus(400);
+        let result = await loyalty.deployment(req.body.name, req.body.stage);
+        res
+            .status(200)
+            .send(result);
+    })
+
 module.exports = router;

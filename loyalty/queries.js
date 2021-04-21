@@ -11,6 +11,9 @@ const partnerScheme = new Schema({
 
 const Partner = mongoose.model('Partner', partnerScheme, 'loyalty');
 
+const updateScheme = new Schema();
+const deleteScheme = new Schema();
+
 const queries = {
 
     async newpartner (name, colorPrimary, colorAccent, currentDate) {
@@ -29,9 +32,30 @@ const queries = {
     async getnewpartner () {
         let result = [];
         const Partners = mongoose.model('Partners', partnerScheme, 'loyalty');
-        result = await Partners.findOne({}, function (err, doc){
+        result = await Partners.findOne({}, function (err){
             if(err) return console.log(err);
         }).lean();
+        return result;
+    },
+
+    deletenewloyalty (name) {
+        const deleteNew = mongoose.model('deleteNew', deleteScheme, 'loyalty');
+        deleteNew.deleteOne({ 'name' : name }, function (err){
+            if(err) return console.log(err);
+            console.log('Deleted from new loyalty:', name);
+        });
+    },
+
+    async dnsstage (dns, name) {
+        const dnsUpdate = mongoose.model('dns', updateScheme, 'configs');
+        let result = await dnsUpdate.findOneAndUpdate({
+            'name': name
+        }, dns, {
+            strict: false,
+            new: true,
+            upsert: true
+        }).lean();
+
         return result;
     }
 
