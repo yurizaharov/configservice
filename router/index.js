@@ -120,4 +120,19 @@ router
             .send(result);
     })
 
+    .post("/api/key/store", jsonParser, async function (req, res) {
+        if(!req.body || !req.body.registration_ids) return res.sendStatus(400);
+        let result = await methods.keystore(req.body.registration_ids);
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get("/api/key/read", jsonParser, async function (req, res) {
+        let result = await methods.keyread();
+        res
+            .status(200)
+            .send(result);
+    })
+
 module.exports = router;

@@ -14,9 +14,8 @@ new Vue({
                 { text: 'Liquibase patch', value: 'id' },
                 { text: 'Processing', value: 'processingVersion' },
                 { text: 'BPS external', value: 'processingExt' },
-                { text: 'BPS internal', value: 'processingInt' },
+                { text: 'BPS http access', value: 'processingInt' },
                 { text: 'Mobile external', value: 'mobileExt' },
-                { text: 'Mobile internal', value: 'mobileInt' }
             ],
 
         }
@@ -59,7 +58,6 @@ new Vue({
                     { text: 'Liquibase patch', value: 'id' },
                     { text: 'Version', value: 'beniobmsVersion' },
                     { text: 'beniobms Ext', value: 'beniobmsExt' },
-                    { text: 'beniobms Int', value: 'beniobmsInt' }
                 ],
 
             }

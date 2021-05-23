@@ -156,6 +156,14 @@ const methods = {
             })
         }
         return processingData;
+    },
+
+    keystore: async function (registration_ids) {
+        return await queries.keystore(registration_ids);
+    },
+
+    keyread: async function () {
+        return await queries.keyread();
     }
 
 }
