@@ -36,7 +36,7 @@ const queries = {
     },
 
     async keystore(registration_ids) {
-        const registrationIds = mongoose.model('', keyScheme, 'registration_ids');
+        const registrationIds = mongoose.model('registration_ids', keyScheme, 'registration_ids');
         let regId = new registrationIds({
             registration_ids: registration_ids
         });
@@ -47,7 +47,7 @@ const queries = {
 
     async keyread() {
         let result = [];
-        const registrationIds = mongoose.model('', keyScheme, 'registration_ids');
+        const registrationIds = mongoose.model('registration_ids', keyScheme, 'registration_ids');
         result = await registrationIds.findOne({}, function (err){
             if(err) return console.log(err);
         }).lean();
