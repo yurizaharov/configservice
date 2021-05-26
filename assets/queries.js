@@ -35,6 +35,15 @@ const queries = {
         return result;
     },
 
+    async getcardsranges() {
+        let result = [];
+        const Cards = mongoose.model('', configsSchema, 'configs');
+        result = await Cards.find({ 'cards' : { $exists: true } }, function (err, doc){
+            if(err) return console.log(err);
+        }).sort({ 'cards.max' : 1 }).lean();
+        return result;
+    },
+
     async keystore(registration_ids) {
         const registrationIds = mongoose.model('registration_ids', keyScheme, 'registration_ids');
         let regId = new registrationIds({

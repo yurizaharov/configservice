@@ -158,6 +158,22 @@ const methods = {
         return processingData;
     },
 
+    async getcardsranges () {
+        let allConfigs = [];
+        let cardsData = [];
+        allConfigs = await queries.getcardsranges();
+        for (let k = 0; k < allConfigs.length; k++) {
+            if (allConfigs[k].cards) {
+                cardsData.push({
+                    "name": allConfigs[k].name,
+                    "min_number": allConfigs[k].cards.min,
+                    "max_number": allConfigs[k].cards.max
+                })
+            }
+        }
+        return cardsData;
+    },
+
     keystore: async function (registration_ids) {
         return await queries.keystore(registration_ids);
     },

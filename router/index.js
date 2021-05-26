@@ -92,6 +92,13 @@ router
             .send(result);
     })
 
+    .get('/api/configs/cards', async (req, res) => {
+        let result = await methods.getcardsranges()
+        res
+            .status(200)
+            .send(result);
+    })
+
     .post("/api/loyalty/new", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
         let sendResult = await loyalty.newpartner(req.body.name, req.body.colorPrimary, req.body.colorAccent);
