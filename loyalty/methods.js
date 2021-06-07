@@ -29,6 +29,25 @@ module.exports = {
             "code": code,
             "status": status
         };
+    },
+
+    getallnames: async function () {
+        let allData = [];
+        let allNames = [];
+        allData = await queries.getall();
+        for (let k = 0; k < allData.length; k++) {
+            if (allData[k].dns) {
+                allNames[k*2] = allData[k].dns.name;
+            }
+            if (allData[k].name) {
+                allNames[k*2+1] = allData[k].name;
+            }
+        }
+        return {
+            "code": "0",
+            "status": "success",
+            "names": allNames
+        };
     }
 
 }

@@ -13,8 +13,18 @@ const Partner = mongoose.model('Partner', partnerScheme, 'loyalty');
 
 const updateScheme = new Schema();
 const deleteScheme = new Schema();
+const configsSchema = new Schema();
 
 const queries = {
+
+    async getall () {
+        let result = [];
+        const Total = mongoose.model('allConfigs', configsSchema, 'configs');
+        result = await Total.find({}, function (err, doc) {
+            if (err) return console.log(err);
+        }).sort({'name': 1}).lean();
+        return result;
+    },
 
     async newpartner (name, colorPrimary, colorAccent, currentDate) {
         let partner = new Partner({
