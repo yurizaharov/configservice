@@ -1,11 +1,36 @@
 const functions = require('../loyalty/functions')
 const queries = require('../loyalty/queries')
 
+// Setting variables
+connectString = process.env.connectString || '192.168.4.248:1521/BONUS'
+
 module.exports = {
 
     newpartner: async function (name, colorPrimary, colorAccent) {
+        let partner = {};
         let currentDate = new Date().toLocaleString('ru-RU');
-        return await queries.newpartner(name, colorPrimary, colorAccent, currentDate);
+        let lastId = await queries.getlastid();
+        let user = functions.usergen(name);
+        let password = functions.passgen(lastId);
+        partner.loyalty_id = lastId + 1;
+        partner.type = 'loyalty30';
+        partner.name = name;
+        partner.description = null;
+        partner.subscription = true;
+        partner.stage = 'new';
+        partner.inProd = false;
+        partner.database = {};
+        partner.database.user = user;
+        partner.database.password = password;
+        partner.database.connectString = connectString;
+        partner.dns = {};
+        partner.dns.domain = "bms.group";
+        partner.dns.subdomain = "srv";
+        partner.dns.name = name;
+        partner.cards = {};
+        partner.cards.min = String(8000100600000000 + partner.loyalty_id*100000);
+        partner.cards.max = String(8000100600099999 + partner.loyalty_id*100000);
+        return await queries.savepartner(name, partner, currentDate);
     },
 
     getnewpartner: async function () {
