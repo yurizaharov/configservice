@@ -4,9 +4,6 @@ const Schema = mongoose.Schema;
 
 const configsSchema = new Schema();
 
-const keyScheme = new Schema({
-    registration_ids: String
-});
 
 const queries = {
 
@@ -44,25 +41,14 @@ const queries = {
         return result;
     },
 
-    async keystore(registration_ids) {
-        const registrationIds = mongoose.model('registration_ids', keyScheme, 'registration_ids');
-        let regId = new registrationIds({
-            registration_ids: registration_ids
-        });
-        regId.save(function (err) {
-            if (err) return console.log(err);
-        });
-    },
-
-    async keyread() {
-        let result = [];
-        const registrationIds = mongoose.model('registration_ids', keyScheme, 'registration_ids');
-        result = await registrationIds.findOne({}, function (err){
+    async getDefaults(purpose) {
+        const Defaults = mongoose.model('defaults', configsSchema, 'defaults');
+        let result = await Defaults.find({ 'purpose' : purpose }, function (err, doc){
             if(err) return console.log(err);
         }).lean();
-        return result.registration_ids;
+        return result;
     },
 
-}
+    }
 
 module.exports = queries;

@@ -20,9 +20,23 @@ const partnerScheme = new Schema({
         subdomain: String,
         name: String
     },
+    bps:{
+        context: String,
+        token: String,
+        subdomain: String
+    },
     cards: {
         min: String,
         max: String
+    },
+    mobile: {
+        context: String,
+        token: String,
+        subdomain: String
+    },
+    beniobms: {
+        token: String,
+        subdomain: String
     }
 });
 
@@ -46,10 +60,14 @@ const queries = {
     async getlastid () {
         let result = [];
         const LastId = mongoose.model('getLastId', configsSchema, 'configs');
-        result = await LastId.find({ 'loyalty_id' : { $exists: true } }, function (err, doc) {
+        result = await LastId.find({ 'type' : 'loyalty30', 'loyalty_id' : { $exists: true } }, function (err, doc) {
             if (err) return console.log(err);
         }).sort({'loyalty_id': -1}).lean();
-        return result[0].loyalty_id;
+        if (!result[0]) {
+            return 0;
+        } else {
+            return result[0].loyalty_id;
+        }
     },
 
     async savepartner (name, partner, currentDate) {

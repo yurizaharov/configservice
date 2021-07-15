@@ -12,6 +12,7 @@ module.exports = {
         let lastId = await queries.getlastid();
         let user = functions.usergen(name);
         let password = functions.passgen(lastId);
+        let procPassword = functions.passgen();
         partner.loyalty_id = lastId + 1;
         partner.type = 'loyalty30';
         partner.name = name;
@@ -24,12 +25,23 @@ module.exports = {
         partner.database.password = password;
         partner.database.connectString = connectString;
         partner.dns = {};
-        partner.dns.domain = "bms.group";
-        partner.dns.subdomain = "srv";
+        partner.dns.domain = 'bms.group';
+        partner.dns.subdomain = 'srv';
         partner.dns.name = name;
+        partner.bps = {};
+        partner.bps.context = 'bps-' + name;
+        partner.bps.token = procPassword;
+        partner.bps.subdomain = 'srv';
         partner.cards = {};
         partner.cards.min = String(8000100600000000 + partner.loyalty_id*100000);
         partner.cards.max = String(8000100600099999 + partner.loyalty_id*100000);
+        partner.mobile = {};
+        partner.mobile.context =  'mobile-' + name;
+        partner.mobile.token = procPassword;
+        partner.mobile.subdomain = 'srv';
+        partner.beniobms = {};
+        partner.beniobms.token = functions.passgen();
+        partner.beniobms.subdomain = 'adb';
         return await queries.savepartner(name, partner, currentDate);
     },
 

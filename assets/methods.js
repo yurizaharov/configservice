@@ -4,13 +4,13 @@ const oracle = require('../db/oracle')
 
 const methods = {
 
-    async getallconfigs () {
+    async getallconfigs() {
         let allData = [];
         allData = await queries.getall();
         return allData;
     },
 
-    async getbeniobmsconfigs (name) {
+    async getbeniobmsconfigs(name) {
         let allConfigs = [];
         let beniobmsData = [];
         allConfigs = await queries.getall(name);
@@ -34,7 +34,7 @@ const methods = {
         return beniobmsData;
     },
 
-    async getdatabaseconfigs (name) {
+    async getdatabaseconfigs(name) {
         let allConfigs = [];
         let databaseData = [];
         allConfigs = await queries.getall(name);
@@ -52,7 +52,7 @@ const methods = {
         return databaseData;
     },
 
-    async getmobilebackconfigs (name) {
+    async getmobilebackconfigs(name) {
         let allConfigs = [];
         let mobileBackData = [];
         allConfigs = await queries.getall(name);
@@ -77,7 +77,7 @@ const methods = {
         return mobileBackData;
     },
 
-    async getstatsenderconfigs () {
+    async getstatsenderconfigs() {
         let statSenderConfigs = [];
         let statSenderData = [];
         statSenderConfigs = await queries.getstatsender();
@@ -92,7 +92,7 @@ const methods = {
         return statSenderData;
     },
 
-    async liquibeniobms () {
+    async liquibeniobms() {
         let beniobmsData = [];
         let allConfigs = await queries.getall();
         for (let k = 0; k < allConfigs.length; k++) {
@@ -123,13 +123,13 @@ const methods = {
         return beniobmsData;
     },
 
-    async liquiprocessing () {
+    async liquiprocessing() {
         let processingData = [];
         let allConfigs = await queries.getall();
         for (let k = 0; k < allConfigs.length; k++) {
             let dataBase = allConfigs[k].name;
             let currentPatch, processingVersion, dns;
-            let processingExt,processingInt,mobileExt,mobileInt;
+            let processingExt, processingInt, mobileExt, mobileInt;
             if (allConfigs[k].database) {
                 currentPatch = await oracle.getpatch(allConfigs[k].database)
             }
@@ -158,7 +158,7 @@ const methods = {
         return processingData;
     },
 
-    async getcardsranges () {
+    async getcardsranges() {
         let allConfigs = [];
         let cardsData = [];
         allConfigs = await queries.getcardsranges();
@@ -174,13 +174,56 @@ const methods = {
         return cardsData;
     },
 
-    keystore: async function (registration_ids) {
-        return await queries.keystore(registration_ids);
-    },
+    async getdnsrecords(name) {
+        let dnsData = [];
+        let allConfigs = await queries.getall(name);
+        let processings = await queries.getDefaults('processings');
+        let beniobms = await queries.getDefaults('beniobms');
+        let web = await queries.getDefaults('web');
 
-    keyread: async function () {
-        return await queries.keyread();
-    }
+        for (let k = 0; k < allConfigs.length; k++) {
+            if (allConfigs[k].dns && allConfigs[k].bps && allConfigs[k].mobile && allConfigs[k].beniobms) {
+                let domain = allConfigs[k].dns.domain;
+
+                let bpsSubdomain = name + '.' + allConfigs[k].bps.subdomain;
+                for (let i = 0; i < processings[k].content.length; i++) {
+                    dnsData.push({
+                        "domain": domain,
+                        "subdomain": bpsSubdomain,
+                        "type": processings[k].type,
+                        "content": processings[k].content[i],
+                        "ttl": processings[k].ttl
+                    })
+                }
+
+                let beniobmsSubdomain = name + '.' + allConfigs[k].beniobms.subdomain;
+                for (let i = 0; i < beniobms[k].content.length; i++) {
+                    dnsData.push({
+                        "domain": domain,
+                        "subdomain": beniobmsSubdomain,
+                        "type": beniobms[k].type,
+                        "content": beniobms[k].content[i],
+                        "ttl": beniobms[k].ttl
+                    })
+                }
+
+                let webSubdomain = name;
+                for (let i = 0; i < web[k].content.length; i++) {
+                    dnsData.push({
+                        "domain": domain,
+                        "subdomain": webSubdomain,
+                        "type": web[k].type,
+                        "content": web[k].content[i],
+                        "ttl": web[k].ttl
+                    })
+                }
+
+            }
+        }
+
+        return dnsData;
+
+    },
 
 }
 

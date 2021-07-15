@@ -99,6 +99,14 @@ router
             .send(result);
     })
 
+    .get('/api/configs/dns/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getdnsrecords(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
     .post("/api/loyalty/new", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
         let sendResult = await loyalty.newpartner(req.body.name, req.body.colorPrimary, req.body.colorAccent);
@@ -129,21 +137,6 @@ router
     .post("/api/loyalty/deployment", jsonParser, async function (req, res) {
         if(!req.body || !req.body.stage || !req.body.name || !req.body.state) return res.sendStatus(400);
         let result = await loyalty.deployment(req.body.name, req.body.stage);
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .post("/api/key/store", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.registration_ids) return res.sendStatus(400);
-        let result = await methods.keystore(req.body.registration_ids);
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .get("/api/key/read", jsonParser, async function (req, res) {
-        let result = await methods.keyread();
         res
             .status(200)
             .send(result);
