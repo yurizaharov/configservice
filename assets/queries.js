@@ -43,7 +43,7 @@ const queries = {
 
     async getDefaults(purpose) {
         const Defaults = mongoose.model('defaults', configsSchema, 'defaults');
-        let result = await Defaults.find({ 'purpose' : purpose }, function (err, doc){
+        let result = await Defaults.findOne({ 'purpose' : purpose }, function (err, doc){
             if(err) return console.log(err);
         }).lean();
         return result;

@@ -47,6 +47,21 @@ router
             .send(result);
     })
 
+    .get('/api/configs/bps', async (req, res) => {
+        let result = await methods.getbpsconfigs()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/bps/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getbpsconfigs(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
     .get('/api/configs/mobileback', async (req, res) => {
         let result = await methods.getmobilebackconfigs()
         res

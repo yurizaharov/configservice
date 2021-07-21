@@ -52,29 +52,50 @@ const methods = {
         return databaseData;
     },
 
-    async getmobilebackconfigs(name) {
-        let allConfigs = [];
-        let mobileBackData = [];
-        allConfigs = await queries.getall(name);
+    async getbpsconfigs(name) {
+        let bpsData = [];
+        let allConfigs = await queries.getall(name);
+        let processings = await queries.getDefaults('processings');
         for (let k = 0; k < allConfigs.length; k++) {
-            if (allConfigs[k].mobile) {
-                let name = allConfigs[k].mobile.name || allConfigs[k].dns.name;
-                let subdomain = allConfigs[k].mobile.subdomain || allConfigs[k].dns.subdomain;
-                let domain = allConfigs[k].dns.domain
-                let dns = name + '.' + subdomain + '.' + domain;
-                let mobileContext = allConfigs[k].mobile.context
-                let mobilePlacement = allConfigs[k].mobile.placement
-                let mobilePort = allConfigs[k].mobile.port
-                let mobileToken = allConfigs[k].mobile.token
-                mobileBackData.push({
+            if (allConfigs[k].bps) {
+                let address = 'https://' + allConfigs[k].name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
+                let url = address + '/' + allConfigs[k].bps.context + '/';
+                bpsData.push({
                     "name": allConfigs[k].name,
-                    "mobileExt": 'https://' + dns + '/' + mobileContext + '/',
-                    "mobileInt": 'http://' + mobilePlacement + ':' + mobilePort + '/' + mobileContext + '/',
-                    "token": mobileToken
-                })
+                    "address": address,
+                    "url": url,
+                    "port": 300 + allConfigs[k].loyalty_id + '10',
+                    "context": allConfigs[k].bps.context,
+                    "token": allConfigs[k].bps.token,
+                    "min_card": allConfigs[k].cards.min,
+                    "max_card": allConfigs[k].cards.max,
+                    "build": processings.build
+                });
             }
         }
-        return mobileBackData;
+        return bpsData;
+    },
+
+    async getmobilebackconfigs(name) {
+        let mobileData = [];
+        let allConfigs = await queries.getall(name);
+        let processings = await queries.getDefaults('processings');
+        for (let k = 0; k < allConfigs.length; k++) {
+            if (allConfigs[k].mobile) {
+                let address = 'https://' + allConfigs[k].name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
+                let url = address + '/' + allConfigs[k].mobile.context + '/';
+                mobileData.push({
+                    "name": allConfigs[k].name,
+                    "address": address,
+                    "url": url,
+                    "port": 300 + allConfigs[k].loyalty_id + '27',
+                    "context": allConfigs[k].mobile.context,
+                    "token": allConfigs[k].mobile.token,
+                    "build": processings.build
+                });
+            }
+        }
+        return mobileData;
     },
 
     async getstatsenderconfigs() {
@@ -186,35 +207,35 @@ const methods = {
                 let domain = allConfigs[k].dns.domain;
 
                 let bpsSubdomain = name + '.' + allConfigs[k].bps.subdomain;
-                for (let i = 0; i < processings[k].content.length; i++) {
+                for (let i = 0; i < processings[k].dns.content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": bpsSubdomain,
-                        "type": processings[k].type,
-                        "content": processings[k].content[i],
-                        "ttl": processings[k].ttl
+                        "type": processings[k].dns.type,
+                        "content": processings[k].dns.content[i],
+                        "ttl": processings[k].dns.ttl
                     })
                 }
 
                 let beniobmsSubdomain = name + '.' + allConfigs[k].beniobms.subdomain;
-                for (let i = 0; i < beniobms[k].content.length; i++) {
+                for (let i = 0; i < beniobms[k].dns.content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": beniobmsSubdomain,
-                        "type": beniobms[k].type,
-                        "content": beniobms[k].content[i],
-                        "ttl": beniobms[k].ttl
+                        "type": beniobms[k].dns.type,
+                        "content": beniobms[k].dns.content[i],
+                        "ttl": beniobms[k].dns.ttl
                     })
                 }
 
                 let webSubdomain = name;
-                for (let i = 0; i < web[k].content.length; i++) {
+                for (let i = 0; i < web[k].dns.content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": webSubdomain,
-                        "type": web[k].type,
-                        "content": web[k].content[i],
-                        "ttl": web[k].ttl
+                        "type": web[k].dns.type,
+                        "content": web[k].dns.content[i],
+                        "ttl": web[k].dns.ttl
                     })
                 }
 
