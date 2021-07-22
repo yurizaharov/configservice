@@ -59,11 +59,11 @@ const methods = {
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].bps) {
                 let address = 'https://' + allConfigs[k].name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
-                let url = address + '/' + allConfigs[k].bps.context + '/';
+                let bpsExt = address + '/' + allConfigs[k].bps.context + '/';
                 bpsData.push({
                     "name": allConfigs[k].name,
                     "address": address,
-                    "url": url,
+                    "bpsExt": bpsExt,
                     "port": 300 + allConfigs[k].loyalty_id + '10',
                     "context": allConfigs[k].bps.context,
                     "token": allConfigs[k].bps.token,
@@ -83,11 +83,11 @@ const methods = {
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].mobile) {
                 let address = 'https://' + allConfigs[k].name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
-                let url = address + '/' + allConfigs[k].mobile.context + '/';
+                let mobileExt = address + '/' + allConfigs[k].mobile.context + '/';
                 mobileData.push({
                     "name": allConfigs[k].name,
                     "address": address,
-                    "url": url,
+                    "mobileExt": mobileExt,
                     "port": 300 + allConfigs[k].loyalty_id + '27',
                     "context": allConfigs[k].mobile.context,
                     "token": allConfigs[k].mobile.token,
