@@ -58,7 +58,7 @@ const methods = {
         let processings = await queries.getDefaults('processings');
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].bps) {
-                let address = 'https://' + allConfigs[k].name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
+                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
                 let bpsExt = address + '/' + allConfigs[k].bps.context + '/';
                 bpsData.push({
                     "name": allConfigs[k].name,
@@ -82,7 +82,7 @@ const methods = {
         let processings = await queries.getDefaults('processings');
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].mobile) {
-                let address = 'https://' + allConfigs[k].name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
+                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
                 let mobileExt = address + '/' + allConfigs[k].mobile.context + '/';
                 mobileData.push({
                     "name": allConfigs[k].name,
