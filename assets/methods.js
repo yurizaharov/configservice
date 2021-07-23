@@ -207,35 +207,35 @@ const methods = {
                 let domain = allConfigs[k].dns.domain;
 
                 let bpsSubdomain = name + '.' + allConfigs[k].bps.subdomain;
-                for (let i = 0; i < processings[k].dns.content.length; i++) {
+                for (let i = 0; i < processings.dns.content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": bpsSubdomain,
-                        "type": processings[k].dns.type,
-                        "content": processings[k].dns.content[i],
-                        "ttl": processings[k].dns.ttl
+                        "type": processings.dns.type,
+                        "content": processings.dns.content[i],
+                        "ttl": processings.dns.ttl
                     })
                 }
 
                 let beniobmsSubdomain = name + '.' + allConfigs[k].beniobms.subdomain;
-                for (let i = 0; i < beniobms[k].dns.content.length; i++) {
+                for (let i = 0; i < beniobms.dns.content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": beniobmsSubdomain,
-                        "type": beniobms[k].dns.type,
-                        "content": beniobms[k].dns.content[i],
-                        "ttl": beniobms[k].dns.ttl
+                        "type": beniobms.dns.type,
+                        "content": beniobms.dns.content[i],
+                        "ttl": beniobms.dns.ttl
                     })
                 }
 
                 let webSubdomain = name;
-                for (let i = 0; i < web[k].dns.content.length; i++) {
+                for (let i = 0; i < web.dns.content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": webSubdomain,
-                        "type": web[k].dns.type,
-                        "content": web[k].dns.content[i],
-                        "ttl": web[k].dns.ttl
+                        "type": web.dns.type,
+                        "content": web.dns.content[i],
+                        "ttl": web.dns.ttl
                     })
                 }
 
