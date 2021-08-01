@@ -20,8 +20,8 @@ const methods = {
                 beniobmsData.push({
                     "name": allConfigs[k].name,
                     "address": address,
-                    "a-w_port": 31000 + allConfigs[k].loyalty_id + '',
-                    "m-d-s_port": 31700 + allConfigs[k].loyalty_id + '',
+                    "aw_port": 31000 + allConfigs[k].loyalty_id + '',
+                    "mds_port": 31700 + allConfigs[k].loyalty_id + '',
                     "token": allConfigs[k].beniobms.token,
                     "build": beniobms.build
                 })
