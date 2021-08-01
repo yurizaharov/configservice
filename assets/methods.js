@@ -11,23 +11,19 @@ const methods = {
     },
 
     async getbeniobmsconfigs(name) {
-        let allConfigs = [];
         let beniobmsData = [];
-        allConfigs = await queries.getall(name);
+        let allConfigs = await queries.getall(name);
+        let beniobms = await queries.getDefaults('beniobms');
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].beniobms) {
-                let name = allConfigs[k].beniobms.name || allConfigs[k].dns.name;
-                let subdomain = allConfigs[k].beniobms.subdomain || allConfigs[k].dns.subdomain;
-                let domain = allConfigs[k].dns.domain
-                let dns = name + '.' + subdomain + '.' + domain;
-                let beniobmsPlacement = allConfigs[k].beniobms.placement
-                let beniobmsPort = allConfigs[k].beniobms.port
-                let beniobmsToken = allConfigs[k].beniobms.token
+                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].beniobms.subdomain + '.' + allConfigs[k].dns.domain + '/';
                 beniobmsData.push({
                     "name": allConfigs[k].name,
-                    "mobileExt": 'https://' + dns + '/',
-                    "mobileInt": 'http://' + beniobmsPlacement + ':' + beniobmsPort + '/',
-                    "token": beniobmsToken
+                    "address": address,
+                    "a-w_port": 31000 + allConfigs[k].loyalty_id + '',
+                    "m-d-s_port": 31700 + allConfigs[k].loyalty_id + '',
+                    "token": allConfigs[k].beniobms.token,
+                    "build": beniobms.build
                 })
             }
         }
