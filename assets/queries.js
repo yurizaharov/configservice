@@ -49,6 +49,22 @@ const queries = {
         return result;
     },
 
-    }
+    async getPlacement(name) {
+        const Placement = mongoose.model('placement', configsSchema, 'placements');
+        let result = await Placement.findOne({ 'name' : name }, function (err){
+            if(err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
+    async getProjectsInPlacement(placement) {
+        const Projects = mongoose.model('projects', configsSchema, 'configs');
+        let result = await Projects.find({'database.placement' : placement }, function (err) {
+            if (err) return console.log(err);
+        }).sort({'name': 1}).lean();
+        return result;
+    },
+
+}
 
 module.exports = queries;

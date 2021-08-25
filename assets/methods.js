@@ -237,11 +237,29 @@ const methods = {
 
             }
         }
-
         return dnsData;
-
     },
 
-}
+    async getOracleData(name) {
+        let oracleData = [];
+        let projectNames = [];
+        let placement = await queries.getPlacement(name);
+        let projects = await queries.getProjectsInPlacement(name);
+        if (placement !== null) {
+            let oracleUrl = placement.address + ':' + placement.oracle_port + '/' + placement.oracle_sid;
+            for (let i = 0; i < projects.length; i++) {
+                projectNames[i] = projects[i].name
+            }
+            oracleData.push ({
+                "name" : name,
+                "oracle_url" : oracleUrl,
+                "sys_password" : placement.sys_password,
+                "projects" : projectNames
+            });
+        }
+        return oracleData;
+    },
+
+    }
 
 module.exports = methods;

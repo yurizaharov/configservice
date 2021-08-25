@@ -149,9 +149,9 @@ router
             .send(result);
     })
 
-    .post("/api/loyalty/deployment", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.stage || !req.body.name || !req.body.state) return res.sendStatus(400);
-        let result = await loyalty.deployment(req.body.name, req.body.stage);
+    .get('/api/configs/data/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getOracleData(name)
         res
             .status(200)
             .send(result);
