@@ -253,6 +253,7 @@ const methods = {
             oracleData.push ({
                 "name" : name,
                 "oracle_url" : oracleUrl,
+                "oracle_sid" : placement.oracle_sid,
                 "sys_password" : placement.sys_password,
                 "projects" : projectNames
             });
