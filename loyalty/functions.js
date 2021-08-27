@@ -2,18 +2,6 @@ const passfather = require('passfather');
 
 const functions = {
 
-    async getDefaults () {
-        return {
-            "dns" : {
-                "domain" : "bms.group",
-                "subdomain" : "srv"
-            },
-            "beniobms" : {
-                "subdomain": "adb"
-            }
-        }
-    },
-
     symbolsgen (len) {
         let result = '';
         let symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';

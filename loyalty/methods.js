@@ -3,18 +3,19 @@ const queries = require('../loyalty/queries')
 
 // Setting variables
 connectString = process.env.connectString || '192.168.4.248:1521/BONUS'
+databasePlacement = process.env.databasePlacement || 'db3'
 
 module.exports = {
 
-    newpartner: async function (name, colorPrimary, colorAccent) {
+    newpartner: async function (type, name, colorPrimary, colorAccent) {
         let partner = {};
         let currentDate = new Date().toLocaleString('ru-RU');
-        let lastId = await queries.getlastid();
+        let lastId = await queries.getlastid(type);
         let user = functions.usergen(name);
         let password = functions.passgen(lastId);
         let procPassword = functions.passgen();
         partner.loyalty_id = lastId + 1;
-        partner.type = 'loyalty30';
+        partner.type = type;
         partner.name = name;
         partner.description = null;
         partner.subscription = true;
@@ -24,6 +25,7 @@ module.exports = {
         partner.database.user = user;
         partner.database.password = password;
         partner.database.connectString = connectString;
+        partner.database.placement = databasePlacement;
         partner.dns = {};
         partner.dns.domain = 'bms.group';
         partner.dns.subdomain = 'srv';
@@ -33,8 +35,14 @@ module.exports = {
         partner.bps.token = procPassword;
         partner.bps.subdomain = 'srv';
         partner.cards = {};
-        partner.cards.min = String(8000100600000000 + partner.loyalty_id*100000);
-        partner.cards.max = String(8000100600099999 + partner.loyalty_id*100000);
+        if (partner.type === 'loyalty30') {
+            partner.cards.min = String(8000100600000000 + partner.loyalty_id*100000);
+            partner.cards.max = String(8000100600099999 + partner.loyalty_id*100000);
+        }
+        if (partner.type === 'regular') {
+            partner.cards.min = String(8000081600000000 + partner.loyalty_id*1000000);
+            partner.cards.max = String(8000081600999999 + partner.loyalty_id*1000000);
+        }
         partner.mobile = {};
         partner.mobile.context =  'mobile-' + name;
         partner.mobile.token = procPassword;
@@ -47,25 +55,6 @@ module.exports = {
 
     getnewpartner: async function () {
         return await queries.getnewpartner();
-    },
-
-    deployment: async function (name, stage) {
-        let [ code, status ] = [ 1, "error" ];
-        if (stage === 'dns') {
-            let dns = await functions.getDefaults();
-            dns.name = name;
-            dns.dns.name = name;
-            let result = await queries.dnsstage(dns, name);
-            if (result.name === name) {
-                queries.deletenewloyalty(name);
-                code = 0;
-                status = "success";
-            }
-        }
-        return {
-            "code": code,
-            "status": status
-        };
     },
 
     getallnames: async function () {
@@ -85,6 +74,21 @@ module.exports = {
             "status": "success",
             "names": allNames
         };
-    }
+    },
 
-}
+    updateStage: async function (name, stage) {
+        let [ code, status ] = [ 1, "error" ];
+        let result = await queries.updateStage(name, stage);
+        if (result.name === name) {
+            code = 0;
+            status = "success";
+        }
+        return {
+            "code": code,
+            "status": status
+        };
+
+    },
+
+
+    }

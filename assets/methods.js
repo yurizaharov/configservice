@@ -56,11 +56,18 @@ const methods = {
             if (allConfigs[k].bps) {
                 let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
                 let bpsExt = address + '/' + allConfigs[k].bps.context + '/';
+                let port;
+                if (allConfigs[k].type === 'loyalty30') {
+                    port = 300 + allConfigs[k].loyalty_id + '10';
+                }
+                if (allConfigs[k].type === 'regular') {
+                    port = 100 + allConfigs[k].loyalty_id + '10';
+                }
                 bpsData.push({
                     "name": allConfigs[k].name,
                     "address": address,
                     "bpsExt": bpsExt,
-                    "port": 300 + allConfigs[k].loyalty_id + '10',
+                    "port": port,
                     "context": allConfigs[k].bps.context,
                     "token": allConfigs[k].bps.token,
                     "min_card": allConfigs[k].cards.min,
@@ -80,11 +87,18 @@ const methods = {
             if (allConfigs[k].mobile) {
                 let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
                 let mobileExt = address + '/' + allConfigs[k].mobile.context + '/';
+                let port;
+                if (allConfigs[k].type === 'loyalty30') {
+                    port = 300 + allConfigs[k].loyalty_id + '27';
+                }
+                if (allConfigs[k].type === 'regular') {
+                    port = 100 + allConfigs[k].loyalty_id + '27';
+                }
                 mobileData.push({
                     "name": allConfigs[k].name,
                     "address": address,
                     "mobileExt": mobileExt,
-                    "port": 300 + allConfigs[k].loyalty_id + '27',
+                    "port": port,
                     "context": allConfigs[k].mobile.context,
                     "token": allConfigs[k].mobile.token,
                     "build": processings.build
@@ -259,6 +273,15 @@ const methods = {
             });
         }
         return oracleData;
+    },
+
+    async getLoyaltyId(name) {
+        let loyaltyId = await queries.getLoyaltyId(name);
+        loyaltyId = loyaltyId.loyalty_id
+        return {
+            "name" : name,
+            "loyalty_id" : loyaltyId
+        }
     },
 
     }

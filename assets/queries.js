@@ -65,6 +65,14 @@ const queries = {
         return result;
     },
 
-}
+    async getLoyaltyId(name) {
+        const LoyaltyId = mongoose.model('loyalty_id', configsSchema, 'configs');
+        let result = await LoyaltyId.findOne({ 'name' : name }, 'loyalty_id', function (err){
+            if(err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
+    }
 
 module.exports = queries;

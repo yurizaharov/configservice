@@ -13,7 +13,8 @@ const partnerScheme = new Schema({
     database: {
         user: String,
         password: String,
-        connectString: String
+        connectString: String,
+        placement: String
     },
     dns: {
         domain: String,
@@ -42,9 +43,8 @@ const partnerScheme = new Schema({
 
 const Partner = mongoose.model('Partner', partnerScheme, 'configs');
 
-const updateScheme = new Schema();
-const deleteScheme = new Schema();
 const configsSchema = new Schema();
+const updateScheme = new Schema();
 
 const queries = {
 
@@ -57,10 +57,10 @@ const queries = {
         return result;
     },
 
-    async getlastid () {
+    async getlastid (type) {
         let result = [];
         const LastId = mongoose.model('getLastId', configsSchema, 'configs');
-        result = await LastId.find({ 'type' : 'loyalty30', 'loyalty_id' : { $exists: true } }, function (err, doc) {
+        result = await LastId.find({ 'type' : type, 'loyalty_id' : { $exists: true } }, function (err, doc) {
             if (err) return console.log(err);
         }).sort({'loyalty_id': -1}).lean();
         if (!result[0]) {
@@ -80,32 +80,24 @@ const queries = {
 
     async getnewpartner () {
         let result = [];
-        result = await Partner.findOne({ 'type' : 'loyalty30', 'stage' : 'new' }, 'name', function (err){
+        result = await Partner.findOne({ 'stage' : 'new' }, 'name', function (err){
             if(err) return console.log(err);
         }).lean();
         return result;
     },
 
-    deletenewloyalty (name) {
-        const deleteNew = mongoose.model('deleteNew', deleteScheme, 'loyalty');
-        deleteNew.deleteOne({ 'name' : name }, function (err){
-            if(err) return console.log(err);
-            console.log('Deleted from new loyalty:', name);
-        });
-    },
-
-    async dnsstage (dns, name) {
-        const dnsUpdate = mongoose.model('dns', updateScheme, 'configs');
-        let result = await dnsUpdate.findOneAndUpdate({
-            'name': name
-        }, dns, {
+    async updateStage (name, stage) {
+        const stageUpdate = mongoose.model('updateStage', updateScheme, 'configs');
+        let result = await stageUpdate.findOneAndUpdate({ 'name': name },
+            {'stage': stage},
+            {
             strict: false,
             new: true,
             upsert: true
-        }).lean();
+            }).lean();
 
         return result;
-    }
+    },
 
 }
 

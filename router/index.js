@@ -122,9 +122,43 @@ router
             .send(result);
     })
 
+    .get('/api/configs/getloyaltyid/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getLoyaltyId(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
     .post("/api/loyalty/new", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
-        let sendResult = await loyalty.newpartner(req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        let sendResult = await loyalty.newpartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        console.log(sendResult)
+        const resData = {
+            "code": 0,
+            "status": "success"
+        }
+        res
+            .status(200)
+            .send(resData);
+    })
+
+    .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
+        if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
+        let sendResult = await loyalty.newpartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        console.log(sendResult)
+        const resData = {
+            "code": 0,
+            "status": "success"
+        }
+        res
+            .status(200)
+            .send(resData);
+    })
+
+    .post("/api/loyalty/newregular", jsonParser, async function (req, res) {
+        if(!req.body || !req.body.name) return res.sendStatus(400);
+        let sendResult = await loyalty.newpartner('regular', req.body.name);
         console.log(sendResult)
         const resData = {
             "code": 0,
@@ -144,6 +178,14 @@ router
 
     .get("/api/loyalty/getallnames", async function (req, res) {
         let result = await loyalty.getallnames()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .post("/api/loyalty/deployment", jsonParser, async function (req, res) {
+        if(!req.body || !req.body.stage || !req.body.name) return res.sendStatus(400);
+        let result = await loyalty.updateStage(req.body.name, req.body.stage);
         res
             .status(200)
             .send(result);
