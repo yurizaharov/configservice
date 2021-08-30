@@ -41,7 +41,8 @@ const methods = {
                     "description": allConfigs[k].description,
                     "user": allConfigs[k].database.user,
                     "password": allConfigs[k].database.password,
-                    "connectString": allConfigs[k].database.connectString
+                    "connectString": allConfigs[k].database.connectString,
+                    "placement": allConfigs[k].database.placement
                 })
             }
         }
