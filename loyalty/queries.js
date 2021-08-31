@@ -51,7 +51,7 @@ const queries = {
     async getall () {
         let result = [];
         const Total = mongoose.model('allConfigs', configsSchema, 'configs');
-        result = await Total.find({}, function (err, doc) {
+        result = await Total.find({ 'type' : { $exists: true } }, function (err, doc) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
         return result;

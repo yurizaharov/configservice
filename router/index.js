@@ -130,6 +130,22 @@ router
             .send(result);
     })
 
+    .get('/api/configs/data/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getOracleData(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/bundleid/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getBundleIdData(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
     .post("/api/loyalty/new", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
         let sendResult = await loyalty.newpartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
@@ -186,14 +202,6 @@ router
     .post("/api/loyalty/deployment", jsonParser, async function (req, res) {
         if(!req.body || !req.body.stage || !req.body.name) return res.sendStatus(400);
         let result = await loyalty.updateStage(req.body.name, req.body.stage);
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .get('/api/configs/data/:name', async (req, res) => {
-        const name = req.params.name;
-        let result = await methods.getOracleData(name)
         res
             .status(200)
             .send(result);

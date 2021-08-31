@@ -285,6 +285,19 @@ const methods = {
         }
     },
 
-    }
+    async getBundleIdData(name) {
+        let bundleIdData = {};
+        let configData = await queries.getBundleIdData(name);
+        if (configData !== null) {
+            let address = 'https://' + configData.dns.name + '.' + configData.dns.subdomain + '.' + configData.dns.domain;
+            let mobileExt = address + '/' + configData.mobile.context + '/';
+            bundleIdData.name = configData.name;
+            bundleIdData.mobileExt = mobileExt;
+            bundleIdData.token = configData.mobile.token;
+        }
+        return bundleIdData;
+    },
+
+}
 
 module.exports = methods;

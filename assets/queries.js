@@ -11,7 +11,7 @@ const queries = {
         let result = [];
         const Total = mongoose.model('', configsSchema, 'configs');
         if (!name) {
-            result = await Total.find({}, function (err, doc) {
+            result = await Total.find({ 'type' : { $exists: true } }, function (err, doc) {
 //            result = await Total.find( { "test" : true }, function (err, doc){
                 if (err) return console.log(err);
             }).sort({'name': 1}).lean();
@@ -73,6 +73,14 @@ const queries = {
         return result;
     },
 
-    }
+    async getBundleIdData(name) {
+        const BundleIdData = mongoose.model('bundleid', configsSchema, 'configs');
+        let result = await BundleIdData.findOne( { 'mobile.bundleid' : name },'', function (err){
+            if(err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
+}
 
 module.exports = queries;
