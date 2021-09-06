@@ -87,8 +87,10 @@ module.exports = {
             "code": code,
             "status": status
         };
-
     },
 
+    getLoyaltyData: async function (name) {
+        return await queries.getLoyaltyData(name);
+    },
 
-    }
+}

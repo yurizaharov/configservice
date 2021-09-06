@@ -1,6 +1,7 @@
-require('../db/mongodb')
+require('../db/mongodb');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const loyaltyConn = require('../db/mongodb')
 
 const partnerScheme = new Schema({
     loyalty_id: Number,
@@ -94,6 +95,15 @@ const queries = {
             strict: false,
             new: true,
             upsert: true
+            }).lean();
+
+        return result;
+    },
+
+    async getLoyaltyData (name) {
+        const loyaltyData = loyaltyConn.model('getLoyaltyData', configsSchema, 'users');
+        let result = await loyaltyData.findOne({ 'site': name }, '', function (err){
+                if(err) return console.log(err);
             }).lean();
 
         return result;

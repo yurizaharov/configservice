@@ -207,4 +207,12 @@ router
             .send(result);
     })
 
+    .get("/api/loyalty/data/:name", async function (req, res) {
+        const name = req.params.name;
+        let result = await loyalty.getLoyaltyData(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
 module.exports = router;
