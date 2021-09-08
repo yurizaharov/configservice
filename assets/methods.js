@@ -240,12 +240,12 @@ const methods = {
                 }
 
                 let webSubdomain = name;
-                for (let i = 0; i < web.dns.content.length; i++) {
+                for (let i = 0; i < web.dns[allConfigs[k].type].content.length; i++) {
                     dnsData.push({
                         "domain": domain,
                         "subdomain": webSubdomain,
                         "type": web.dns.type,
-                        "content": web.dns.content[i],
+                        "content": web.dns[allConfigs[k].type].content[i],
                         "ttl": web.dns.ttl
                     })
                 }
@@ -278,10 +278,10 @@ const methods = {
 
     async getLoyaltyId(name) {
         let loyaltyId = await queries.getLoyaltyId(name);
-        loyaltyId = loyaltyId.loyalty_id
         return {
             "name" : name,
-            "loyalty_id" : loyaltyId
+            "loyalty_id" : loyaltyId.loyalty_id,
+            "type" : loyaltyId.type
         }
     },
 

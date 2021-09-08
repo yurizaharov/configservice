@@ -43,7 +43,7 @@ const queries = {
 
     async getDefaults(purpose) {
         const Defaults = mongoose.model('defaults', configsSchema, 'defaults');
-        let result = await Defaults.findOne({ 'purpose' : purpose }, function (err, doc){
+        let result = await Defaults.findOne({ 'purpose' : purpose }, '',function (err){
             if(err) return console.log(err);
         }).lean();
         return result;
@@ -67,7 +67,7 @@ const queries = {
 
     async getLoyaltyId(name) {
         const LoyaltyId = mongoose.model('loyalty_id', configsSchema, 'configs');
-        let result = await LoyaltyId.findOne({ 'name' : name }, 'loyalty_id', function (err){
+        let result = await LoyaltyId.findOne({ 'name' : name }, 'loyalty_id type', function (err){
             if(err) return console.log(err);
         }).lean();
         return result;
