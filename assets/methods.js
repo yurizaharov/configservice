@@ -255,6 +255,25 @@ const methods = {
         return dnsData;
     },
 
+    async getbmscardwebconfigs(name) {
+        let webConfigs = [];
+        let webData = await queries.getWebData(name);
+        let allConfigs = await queries.getall(name);
+        for (let k = 0; k < allConfigs.length; k++) {
+            if (allConfigs[k].type === 'loyalty30') {
+                let port = 300 + allConfigs[k].loyalty_id + '70';
+                webConfigs.push({
+                    "name": name,
+                    "port": port,
+                    "colorPrimary": webData.color1,
+                    "colorAccent": webData.color2,
+                    "description": webData.name
+                })
+            }
+        }
+        return webConfigs;
+    },
+
     async getOracleData(name) {
         let oracleData = [];
         let projectNames = [];

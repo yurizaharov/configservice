@@ -1,5 +1,6 @@
 require('../db/mongodb');
 const mongoose = require('mongoose');
+const loyaltyConn = require("../db/mongodb");
 const Schema = mongoose.Schema;
 
 const configsSchema = new Schema();
@@ -81,6 +82,13 @@ const queries = {
         return result;
     },
 
+    async getWebData (name) {
+        const loyaltyData = loyaltyConn.model('getWebData', configsSchema, 'users');
+        let result = await loyaltyData.findOne({ 'site': name }, 'color1 color2 name', function (err){
+            if(err) return console.log(err);
+        }).lean();
+        return result;
+    },
 }
 
 module.exports = queries;
