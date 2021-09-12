@@ -259,6 +259,7 @@ const methods = {
         let webConfigs = [];
         let webData = await queries.getWebData(name);
         let allConfigs = await queries.getall(name);
+        let web = await queries.getDefaults('web');
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].type === 'loyalty30') {
                 let port = 300 + allConfigs[k].loyalty_id + '70';
@@ -267,6 +268,7 @@ const methods = {
                     "port": port,
                     "colorPrimary": webData.color1,
                     "colorAccent": webData.color2,
+                    "build": web.build,
                     "description": webData.name
                 })
             }
