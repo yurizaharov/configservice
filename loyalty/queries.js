@@ -39,6 +39,9 @@ const partnerScheme = new Schema({
     beniobms: {
         token: String,
         subdomain: String
+    },
+    giftcardweb: {
+        subdomain: String
     }
 });
 

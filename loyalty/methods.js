@@ -50,6 +50,8 @@ module.exports = {
         partner.beniobms = {};
         partner.beniobms.token = functions.passgen();
         partner.beniobms.subdomain = 'adb';
+        partner.giftcardweb = {};
+        partner.giftcardweb.subdomain = 'gcb';
         return await queries.savepartner(name, partner, currentDate);
     },
 

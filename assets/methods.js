@@ -30,6 +30,52 @@ const methods = {
         return beniobmsData;
     },
 
+    async getGiftcardwebConfigs(name) {
+        let giftcardwebData = [];
+        let allConfigs = await queries.getall(name);
+        let giftcardweb = await queries.getDefaults('giftcardweb');
+        for (let k = 0; k < allConfigs.length; k++) {
+            if (allConfigs[k].giftcardweb) {
+                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].giftcardweb.subdomain + '.' + allConfigs[k].dns.domain + '/';
+                let port;
+                if (allConfigs[k].type === 'loyalty30') {
+                    port = 300 + allConfigs[k].loyalty_id + '47';
+                }
+                if (allConfigs[k].type === 'regular') {
+                    port = 100 + allConfigs[k].loyalty_id + '47';
+                }
+                giftcardwebData.push({
+                    "name": allConfigs[k].name,
+                    "address": address,
+                    "port": port,
+                    "build": giftcardweb.build
+                })
+            }
+        }
+        return giftcardwebData;
+    },
+
+    async getExtrapaymentConfigs(name) {
+        let extrapaymentData = [];
+        let allConfigs = await queries.getall(name);
+        let extrapayment = await queries.getDefaults('extrapayment');
+        for (let k = 0; k < allConfigs.length; k++) {
+            let port;
+            if (allConfigs[k].type === 'loyalty30') {
+                port = 300 + allConfigs[k].loyalty_id + '38';
+            }
+            if (allConfigs[k].type === 'regular') {
+                port = 100 + allConfigs[k].loyalty_id + '38';
+            }
+            extrapaymentData.push({
+                "name": allConfigs[k].name,
+                "port": port,
+                "build": extrapayment.build
+            })
+        }
+        return extrapaymentData;
+    },
+
     async getdatabaseconfigs(name) {
         let allConfigs = [];
         let databaseData = [];
@@ -212,6 +258,7 @@ const methods = {
         let processings = await queries.getDefaults('processings');
         let beniobms = await queries.getDefaults('beniobms');
         let web = await queries.getDefaults('web');
+        let giftcardweb = await queries.getDefaults('giftcardweb');
 
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].dns && allConfigs[k].bps && allConfigs[k].mobile && allConfigs[k].beniobms) {
@@ -247,6 +294,17 @@ const methods = {
                         "type": web.dns.type,
                         "content": web.dns[allConfigs[k].type].content[i],
                         "ttl": web.dns.ttl
+                    })
+                }
+
+                let giftcardwebSubdomain = name + '.' + allConfigs[k].giftcardweb.subdomain;
+                for (let i = 0; i < giftcardweb.dns.content.length; i++) {
+                    dnsData.push({
+                        "domain": domain,
+                        "subdomain": giftcardwebSubdomain,
+                        "type": giftcardweb.dns.type,
+                        "content": giftcardweb.dns.content[i],
+                        "ttl": giftcardweb.dns.ttl
                     })
                 }
 
