@@ -1,6 +1,8 @@
 const functions = require('../assets/functions')
 const queries = require('../assets/queries');
 const oracle = require('../db/oracle')
+const fs = require('fs');
+const oracledb = require("oracledb");
 
 const methods = {
 
@@ -177,7 +179,9 @@ const methods = {
             let dataBase = allConfigs[k].name;
             let currentPatch, beniobmsExt, beniobmsInt, beniobmsVersion;
             if (allConfigs[k].database) {
-                currentPatch = await oracle.getpatch(allConfigs[k].database)
+                let sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
+                currentPatch = await oracle.sqlrequest(allConfigs[k].database, sqlQuery);
+                currentPatch = currentPatch.ID;
             }
             if (allConfigs[k].beniobms) {
                 let name = allConfigs[k].beniobms.name || allConfigs[k].dns.name;
@@ -209,7 +213,9 @@ const methods = {
             let currentPatch, processingVersion, dns;
             let processingExt, processingInt, mobileExt, mobileInt;
             if (allConfigs[k].database) {
-                currentPatch = await oracle.getpatch(allConfigs[k].database)
+                let sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
+                currentPatch = await oracle.sqlrequest(allConfigs[k].database, sqlQuery);
+                currentPatch = currentPatch.ID;
             }
             if (allConfigs[k].dns) {
                 dns = allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
@@ -375,6 +381,25 @@ const methods = {
             bundleIdData.token = configData.mobile.token;
         }
         return bundleIdData;
+    },
+
+    async usersSpace(name) {
+        let placement = await queries.getPlacement(name);
+        let initialData = {
+            'user' : 'sys',
+            'password' : placement.sys_password,
+            'connectString' : placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
+            'privilege' : oracledb.SYSDBA
+
+        }
+        let sqlQuery = fs.readFileSync('./db/sql/getusersspace.sql').toString();
+        let usersSpaceData = await oracle.sqlrequest(initialData, sqlQuery);
+
+        return {
+            "bytes" : usersSpaceData.BYTES,
+            "maxbytes" : usersSpaceData.MAXBYTES,
+            "user_bytes" : usersSpaceData.USER_BYTES
+        }
     },
 
 }

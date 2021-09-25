@@ -239,4 +239,12 @@ router
             .send(result);
     })
 
+    .get("/api/monitoring/db/usersspace/:name", async function (req, res) {
+        const name = req.params.name;
+        let result = await methods.usersSpace(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
 module.exports = router;

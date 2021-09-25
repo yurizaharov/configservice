@@ -1,6 +1,6 @@
 {
   "name": "configservice",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "author": "Yury Zakharov",
   "license": "MIT",
   "scripts": {
@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "express": "^4.17.1",
+    "fs": "^0.0.1-security",
     "mongoose": "^5.12.1",
     "oracledb": "^5.1.0",
     "passfather": "^2.1.4",

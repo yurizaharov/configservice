@@ -2,28 +2,20 @@ const oracledb = require('oracledb');
 
 const oracle = {
 
-    async getpatch (initialData) {
+    async sqlrequest (initialData, sqlQuery) {
         let connection;
         try {
-            let sql, binds, options, result;
+            let binds, options, result;
 
-            connection = await oracledb.getConnection({
-                user: initialData.user,
-                password: initialData.password,
-                connectString: initialData.connectString
-            });
+            connection = await oracledb.getConnection(initialData);
 
-            sql = `select *
-                   from DATABASECHANGELOG
-                   where EXECTYPE = 'EXECUTED'
-                   order by DATEEXECUTED desc`;
             binds = {};
             options = {
                 outFormat: oracledb.OUT_FORMAT_OBJECT
             };
 
-            result = await connection.execute(sql, binds, options);
-            return result.rows[0].ID;
+            result = await connection.execute(sqlQuery, binds, options);
+            return result.rows[0];
 
         } catch (err) {
             console.error(err);
