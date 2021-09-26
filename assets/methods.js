@@ -181,8 +181,15 @@ const methods = {
             let dataBase = allConfigs[k].name;
             let currentPatch, beniobmsExt, beniobmsInt, beniobmsVersion;
             if (allConfigs[k].database) {
+                let placement = await queries.getPlacement(allConfigs[k].database.placement);
+                let initialData = {
+                    'user' : allConfigs[k].database.user,
+                    'password' : allConfigs[k].database.password,
+                    'connectString' : placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid
+                }
                 let sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
-                currentPatch = await oracle.sqlrequest(allConfigs[k].database, sqlQuery);
+
+                currentPatch = await oracle.sqlrequest(initialData, sqlQuery);
                 currentPatch = currentPatch.ID;
             }
             if (allConfigs[k].beniobms) {
@@ -215,8 +222,15 @@ const methods = {
             let currentPatch, processingVersion, dns;
             let processingExt, processingInt, mobileExt, mobileInt;
             if (allConfigs[k].database) {
+                let placement = await queries.getPlacement(allConfigs[k].database.placement);
+                let initialData = {
+                    'user' : allConfigs[k].database.user,
+                    'password' : allConfigs[k].database.password,
+                    'connectString' : placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid
+                }
                 let sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
-                currentPatch = await oracle.sqlrequest(allConfigs[k].database, sqlQuery);
+
+                currentPatch = await oracle.sqlrequest(initialData, sqlQuery);
                 currentPatch = currentPatch.ID;
             }
             if (allConfigs[k].dns) {
