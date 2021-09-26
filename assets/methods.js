@@ -84,12 +84,13 @@ const methods = {
         allConfigs = await queries.getall(name);
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].database) {
+                let placement = await queries.getPlacement(allConfigs[k].database.placement);
                 databaseData.push({
                     "name": allConfigs[k].name,
                     "description": allConfigs[k].description,
                     "user": allConfigs[k].database.user,
                     "password": allConfigs[k].database.password,
-                    "connectString": allConfigs[k].database.connectString,
+                    "connectString": placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
                     "placement": allConfigs[k].database.placement
                 })
             }
@@ -162,11 +163,12 @@ const methods = {
         let statSenderData = [];
         statSenderConfigs = await queries.getstatsender();
         for (let k = 0; k < statSenderConfigs.length; k++) {
+            let placement = await queries.getPlacement(statSenderConfigs[k].database.placement);
             statSenderData.push({
                 "dataBase": statSenderConfigs[k].name,
                 "user": statSenderConfigs[k].database.user,
                 "password": statSenderConfigs[k].database.password,
-                "connectString": statSenderConfigs[k].database.connectString
+                "connectString": placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
             })
         }
         return statSenderData;

@@ -2,7 +2,6 @@ const functions = require('../loyalty/functions')
 const queries = require('../loyalty/queries')
 
 // Setting variables
-connectString = process.env.connectString || '192.168.4.248:1521/BONUS'
 databasePlacement = process.env.databasePlacement || 'db3'
 
 module.exports = {
@@ -24,7 +23,6 @@ module.exports = {
         partner.database = {};
         partner.database.user = user;
         partner.database.password = password;
-        partner.database.connectString = connectString;
         partner.database.placement = databasePlacement;
         partner.dns = {};
         partner.dns.domain = 'bms.group';
