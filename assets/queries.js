@@ -66,6 +66,14 @@ const queries = {
         return result;
     },
 
+    async getAllDbPlacements() {
+        const Placements = mongoose.model('alldbplacements', configsSchema, 'placements');
+        let result = await Placements.find({ 'oracle_sid' : { $exists: true } }, function (err) {
+            if (err) return console.log(err);
+        }).sort({'name': 1}).lean();
+        return result;
+    },
+
     async getLoyaltyId(name) {
         const LoyaltyId = mongoose.model('loyalty_id', configsSchema, 'configs');
         let result = await LoyaltyId.findOne({ 'name' : name }, 'loyalty_id type', function (err){

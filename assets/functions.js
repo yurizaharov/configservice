@@ -2,23 +2,26 @@ const axios = require('axios');
 
 const functions = {
 
-    async getbeniobmsversion (beniobmsExt) {
+    async getbeniobmsversion (initialData) {
         let beniobmsVersion;
         try {
-            beniobmsVersion = await axios.get(beniobmsExt + 'actuator/info/')
+            beniobmsVersion = await axios.get(initialData.beniobmsExt + 'actuator/info/')
                 .then((response) => {
                     return response.data.app.version;
                 });
         } catch (err) {
             console.log(err)
         }
-        return beniobmsVersion;
+        return {
+            'name' : initialData.name,
+            'beniobmsVersion' : beniobmsVersion
+        };
     },
 
-    async getprocessingversion (processingExt) {
+    async getprocessingversion (initialData) {
         let processingVersion;
         try {
-            processingVersion = await axios.get(processingExt + 'bpsApi/ping/')
+            processingVersion = await axios.get(initialData.processingExt + 'bpsApi/ping/')
                 .then((response) => {
                     if (!response.data.String) {
                         return response.data.split(' ')[1];
@@ -29,8 +32,16 @@ const functions = {
         } catch (err) {
             console.log(err)
         }
-        return processingVersion;
-    }
+        return {
+            'name' : initialData.name,
+            'processingVersion' : processingVersion
+        };
+    },
+
+    async parallelProcess (callBack, tasksData) {
+        const promises = tasksData.map(callBack);
+        return await Promise.all(promises);
+    },
 
 }
 

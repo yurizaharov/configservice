@@ -2,7 +2,7 @@ const oracledb = require('oracledb');
 
 const oracle = {
 
-    async sqlrequest (initialData, sqlQuery) {
+    async sqlrequest (initialData) {
         let connection;
         try {
             let binds, options, result;
@@ -14,8 +14,11 @@ const oracle = {
                 outFormat: oracledb.OUT_FORMAT_OBJECT
             };
 
-            result = await connection.execute(sqlQuery, binds, options);
-            return result.rows[0];
+            result = await connection.execute(initialData.sqlQuery, binds, options);
+            return {
+                'name' : initialData.name,
+                'data' : result.rows[0]
+            };
 
         } catch (err) {
             console.error(err);
