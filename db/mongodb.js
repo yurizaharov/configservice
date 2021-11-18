@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 // Setting variables
 mongoAddr = process.env.MONGO_ADDR || '192.168.4.231'
 mongoDBS = process.env.MONGO_DBS || 'ConfigService'
+loyaltyMongoAddr = process.env.LOYALTY_MONGO_ADDR || '192.168.4.231'
 loyaltyDBS = process.env.LOYALTY_DBS || 'loyalty'
 
 // Setting instance parameters
 const mongoUri = 'mongodb://' + mongoAddr + '/' + mongoDBS;
 console.log('MongoDB address set to:', mongoUri);
 
-const loyaltyUri = 'mongodb://' + mongoAddr + '/' + loyaltyDBS;
+const loyaltyUri = 'mongodb://' + loyaltyMongoAddr + '/' + loyaltyDBS;
 console.log('MongoDB loyalty address set to:', loyaltyUri);
 
 // Setting mongoose parameters
