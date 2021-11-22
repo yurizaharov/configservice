@@ -1,58 +1,17 @@
 require('../db/mongodb');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const loyaltyConn = require('../db/mongodb')
+const loyaltyConn = require('../db/mongodb');
+const partnerSchema = require('../db/schemes/partner');
 
-const partnerScheme = new Schema({
-    loyalty_id: Number,
-    type: String,
-    name: String,
-    description: String,
-    subscription: Boolean,
-    stage: String,
-    inProd: Boolean,
-    database: {
-        user: String,
-        password: String,
-        connectString: String,
-        placement: String
-    },
-    dns: {
-        domain: String,
-        subdomain: String,
-        name: String
-    },
-    bps:{
-        context: String,
-        token: String,
-        subdomain: String
-    },
-    cards: {
-        min: String,
-        max: String
-    },
-    mobile: {
-        context: String,
-        token: String,
-        subdomain: String
-    },
-    beniobms: {
-        token: String,
-        subdomain: String
-    },
-    giftcardweb: {
-        subdomain: String
-    }
-});
-
-const Partner = mongoose.model('Partner', partnerScheme, 'configs');
+const Partner = mongoose.model('Partner', partnerSchema, 'configs');
 
 const configsSchema = new Schema();
 const updateScheme = new Schema();
 
 const queries = {
 
-    async getall () {
+    async getAll () {
         let result = [];
         const Total = mongoose.model('allConfigs', configsSchema, 'configs');
         result = await Total.find({ 'type' : { $exists: true } }, function (err, doc) {
@@ -61,7 +20,7 @@ const queries = {
         return result;
     },
 
-    async getlastid (type) {
+    async getLastID(type) {
         let result = [];
         const LastId = mongoose.model('getLastId', configsSchema, 'configs');
         result = await LastId.find({ 'type' : type, 'loyalty_id' : { $exists: true } }, function (err, doc) {
@@ -74,15 +33,15 @@ const queries = {
         }
     },
 
-    async savepartner (name, partner, currentDate) {
+    async savePartner (name, partner, currentDate) {
         let newpartner = new Partner(partner);
         newpartner.save(function (err) {
             if (err) return console.log(err);
-        console.log(currentDate, '- Saved new partner:', name);
+            console.log(currentDate, '- Saved new partner:', name);
         });
     },
 
-    async getnewpartner () {
+    async getNewPartner () {
         let result = [];
         result = await Partner.findOne({ 'stage' : 'new' }, 'name', function (err){
             if(err) return console.log(err);

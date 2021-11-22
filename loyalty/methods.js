@@ -6,20 +6,24 @@ databasePlacement = process.env.databasePlacement || 'db3'
 
 module.exports = {
 
-    newpartner: async function (type, name, colorPrimary, colorAccent) {
+    newPartner: async function (type, name, colorPrimary, colorAccent) {
         let partner = {};
         let currentDate = new Date().toLocaleString('ru-RU');
-        let lastId = await queries.getlastid(type);
-        let user = functions.usergen(name);
-        let password = functions.passgen(lastId);
-        let procPassword = functions.passgen();
-        partner.loyalty_id = lastId + 1;
+        let lastId = await queries.getLastID(type);
+        let loyalty_id = lastId + 1;
+        let projectID = (loyalty_id + name).slice(0,6);
+        let user = functions.userGen(name);
+        let password = functions.passGen();
+        let procPassword = functions.passGen();
+        partner.loyalty_id = loyalty_id;
         partner.type = type;
         partner.name = name;
+        partner.location = 'prod';
         partner.description = null;
         partner.subscription = true;
         partner.stage = 'new';
         partner.inProd = false;
+        partner.projectID = projectID;
         partner.database = {};
         partner.database.user = user;
         partner.database.password = password;
@@ -46,21 +50,24 @@ module.exports = {
         partner.mobile.token = procPassword;
         partner.mobile.subdomain = 'srv';
         partner.beniobms = {};
-        partner.beniobms.token = functions.passgen();
+        partner.beniobms.token = functions.passGen();
         partner.beniobms.subdomain = 'adb';
         partner.giftcardweb = {};
         partner.giftcardweb.subdomain = 'gcb';
-        return await queries.savepartner(name, partner, currentDate);
+        partner.bmscardweb = {};
+        partner.bmscardweb.placement = 'k8s';
+        partner.bmscardweb.names = [name];
+        return await queries.savePartner(name, partner, currentDate);
     },
 
-    getnewpartner: async function () {
-        return await queries.getnewpartner();
+    getNewPartner: async function () {
+        return await queries.getNewPartner();
     },
 
-    getallnames: async function () {
+    getAllNames: async function () {
         let allData = [];
         let allNames = [];
-        allData = await queries.getall();
+        allData = await queries.getAll();
         for (let k = 0; k < allData.length; k++) {
             if (allData[k].dns) {
                 allNames[k*2] = allData[k].dns.name;

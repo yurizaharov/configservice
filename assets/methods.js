@@ -359,7 +359,7 @@ const methods = {
         return dnsData;
     },
 
-    async getbmscardwebconfigs(name) {
+    async getBmscardwebConfigs(name) {
         let webConfigs = [];
         let webData = await queries.getWebData(name);
         let allConfigs = await queries.getall(name);
@@ -442,6 +442,14 @@ const methods = {
             "maxbytes" : usersSpaceData.data.MAXBYTES,
             "user_bytes" : usersSpaceData.data.USER_BYTES
         }
+    },
+
+    async getInfrastructure(data) {
+        console.log(data)
+        let location = data.location;
+        let placement = data.placement;
+        let result = await queries.readInfrastructure(location, placement);
+        return result;
     },
 
 }

@@ -90,13 +90,22 @@ const queries = {
         return result;
     },
 
-    async getWebData (name) {
+    async getWebData(name) {
         const loyaltyData = loyaltyConn.model('getWebData', configsSchema, 'users');
         let result = await loyaltyData.findOne({ 'site': name }, 'color1 color2 name', function (err){
             if(err) return console.log(err);
         }).lean();
         return result;
     },
+
+    async readInfrastructure(location, placement, role) {
+        const infrastructureData = mongoose.model('infrastructure', configsSchema, 'infrastructure');
+        let result = await infrastructureData.find( { 'location': location, 'belongs': placement }, function (err){
+            if(err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
 }
 
 module.exports = queries;

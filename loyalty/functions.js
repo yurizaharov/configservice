@@ -2,7 +2,7 @@ const passfather = require('passfather');
 
 const functions = {
 
-    symbolsgen (len) {
+    symbolsGen (len) {
         let result = '';
         let symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         for (let i = 0; i < len; i++){
@@ -11,7 +11,7 @@ const functions = {
         return result;
     },
 
-    passwordgen (len) {
+    passwordGen (len) {
         const result = passfather({
             symbols: false,
             length: len
@@ -19,14 +19,14 @@ const functions = {
         return result;
     },
 
-    usergen (name) {
+    userGen (name) {
         let user = ('c##' + name + 'user').slice(0,10);
         return user
     },
 
-    passgen () {
-        let part1 = functions.symbolsgen(1);
-        let part2 = functions.passwordgen(11);
+    passGen () {
+        let part1 = functions.symbolsGen(1);
+        let part2 = functions.passwordGen(11);
         return part1 + part2;
     },
 

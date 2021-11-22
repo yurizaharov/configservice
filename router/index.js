@@ -79,7 +79,7 @@ router
 
     .get('/api/configs/bmscardweb/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getbmscardwebconfigs(name)
+        let result = await methods.getBmscardwebConfigs(name)
         res
             .status(200)
             .send(result);
@@ -172,7 +172,7 @@ router
 
     .post("/api/loyalty/new", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
-        let sendResult = await loyalty.newpartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
         console.log(sendResult)
         const resData = {
             "code": 0,
@@ -185,7 +185,7 @@ router
 
     .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
-        let sendResult = await loyalty.newpartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
         console.log(sendResult)
         const resData = {
             "code": 0,
@@ -198,7 +198,7 @@ router
 
     .post("/api/loyalty/newregular", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name) return res.sendStatus(400);
-        let sendResult = await loyalty.newpartner('regular', req.body.name);
+        let sendResult = await loyalty.newPartner('regular', req.body.name);
         console.log(sendResult)
         const resData = {
             "code": 0,
@@ -210,14 +210,14 @@ router
     })
 
     .get("/api/loyalty/checknew", async function (req, res) {
-        let result = await loyalty.getnewpartner()
+        let result = await loyalty.getNewPartner()
         res
             .status(200)
             .send(result);
     })
 
     .get("/api/loyalty/getallnames", async function (req, res) {
-        let result = await loyalty.getallnames()
+        let result = await loyalty.getAllNames()
         res
             .status(200)
             .send(result);
@@ -247,4 +247,11 @@ router
             .send(result);
     })
 
+    .post("/api/configs/infrastructure", jsonParser, async function (req, res) {
+        let result = await methods.getInfrastructure(req.body);
+        console.log(result)
+        res
+            .status(200)
+            .send(result);
+    })
 module.exports = router;
