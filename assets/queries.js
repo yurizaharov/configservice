@@ -1,6 +1,6 @@
 require('../db/mongodb');
 const mongoose = require('mongoose');
-const loyaltyConn = require("../db/mongodb");
+const loyaltyConn = require('../db/mongodb');
 const Schema = mongoose.Schema;
 
 const configsSchema = new Schema();
@@ -21,6 +21,14 @@ const queries = {
                 if (err) return console.log(err);
             }).lean();
         }
+        return result;
+    },
+
+    async getOne (name) {
+        const Config = mongoose.model('getOne', configsSchema, 'configs');
+        let result = await Config.findOne({'name': name}, function (err) {
+            if (err) return console.log(err);
+        }).lean();
         return result;
     },
 
@@ -95,12 +103,38 @@ const queries = {
         let result = await loyaltyData.findOne({ 'site': name }, 'color1 color2 name', function (err){
             if(err) return console.log(err);
         }).lean();
+        if (!result) {
+            return {
+                'name' : null,
+                'color1' : null,
+                "color2" : null
+            }
+        }
+        return result;
+    },
+
+    async getBmscardweb() {
+        const webList = mongoose.model('webList', configsSchema, 'configs');
+        let result = await webList.find( { 'bmscardweb' : { $exists: true } }, 'bmscardweb', function (err){
+            if(err) return console.log(err);
+        }).lean();
         return result;
     },
 
     async readInfrastructure(location, placement, role) {
         const infrastructureData = mongoose.model('infrastructure', configsSchema, 'infrastructure');
         let result = await infrastructureData.find( { 'location': location, 'belongs': placement }, function (err){
+            if(err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
+    async getDeployHost(location, placement) {
+        const Placement = mongoose.model('placement', configsSchema, 'placements');
+        let result = await Placement.findOne(
+            { 'deployhost' : true, 'location' : location, 'placement' : placement },
+            'hostname',
+            function (err){
             if(err) return console.log(err);
         }).lean();
         return result;

@@ -2,8 +2,7 @@ const functions = require('../assets/functions');
 const queries = require('../assets/queries');
 const oracle = require('../db/oracle');
 const fs = require('fs');
-const oracledb = require("oracledb");
-
+const oracledb = require('oracledb');
 const methods = {
 
     async getallconfigs() {
@@ -359,25 +358,47 @@ const methods = {
         return dnsData;
     },
 
+    async getBmscardwebList() {
+        let webList = [];
+        let bmscardwebList = [];
+        webList = await queries.getBmscardweb();
+        let placements = webList.map( config => {
+            return config.bmscardweb.placement;
+        });
+        placements = Array.from(new Set(placements));
+        placements.forEach( placement => {
+            let filteredWebList = webList.filter( config => {
+                return config.bmscardweb.placement === placement;
+            });
+            let namesArr = [];
+            filteredWebList.forEach( config => {
+                namesArr = namesArr.concat(config.bmscardweb.names)
+            });
+            bmscardwebList.push({
+                'placement' : placement,
+                'names' : namesArr
+            });
+        });
+        return bmscardwebList;
+    },
+
     async getBmscardwebConfigs(name) {
-        let webConfigs = [];
+        let webConfig = {};
         let webData = await queries.getWebData(name);
-        let allConfigs = await queries.getall(name);
+        let partnerConfig = await queries.getOne(name);
         let web = await queries.getDefaults('web');
-        for (let k = 0; k < allConfigs.length; k++) {
-            if (allConfigs[k].type === 'loyalty30') {
-                let port = 300 + allConfigs[k].loyalty_id + '70';
-                webConfigs.push({
-                    "name": name,
-                    "port": port,
-                    "colorPrimary": webData.color1,
-                    "colorAccent": webData.color2,
-                    "build": web.build,
-                    "description": webData.name
-                })
-            }
-        }
-        return webConfigs;
+        let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.bmscardweb.placement);
+        let basePorts = await queries.getDefaults('baseports');
+        let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
+        webConfig.name = name;
+        webConfig.namespace = name;
+        webConfig.port = basePort + partnerConfig.loyalty_id*20 + web.service_id;
+        webConfig.colorPrimary = webData.color1;
+        webConfig.colorAccent = webData.color2;
+        webConfig.deployhost = deployhost.hostname;
+        webConfig.build = web.build;
+        webConfig.description = partnerConfig.description;
+        return webConfig;
     },
 
     async getOracleData(name) {

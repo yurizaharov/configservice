@@ -77,6 +77,13 @@ router
             .send(result);
     })
 
+    .get('/api/configs/bmscardweb', async (req, res) => {
+        let result = await methods.getBmscardwebList()
+        res
+            .status(200)
+            .send(result);
+    })
+
     .get('/api/configs/bmscardweb/:name', async (req, res) => {
         const name = req.params.name;
         let result = await methods.getBmscardwebConfigs(name)
