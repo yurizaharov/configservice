@@ -398,6 +398,7 @@ const methods = {
         webConfig.deployhost = deployhost.hostname;
         webConfig.build = web.build;
         webConfig.description = partnerConfig.description;
+        webConfig.bmscardweburl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
         return webConfig;
     },
 
