@@ -11,24 +11,82 @@ const methods = {
         return allData;
     },
 
-    async getbeniobmsconfigs(name) {
-        let beniobmsData = [];
-        let allConfigs = await queries.getall(name);
-        let beniobms = await queries.getDefaults('beniobms');
-        for (let k = 0; k < allConfigs.length; k++) {
-            if (allConfigs[k].beniobms) {
-                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].beniobms.subdomain + '.' + allConfigs[k].dns.domain + '/';
-                beniobmsData.push({
-                    "name": allConfigs[k].name,
-                    "address": address,
-                    "aw_port": 31000 + allConfigs[k].loyalty_id + '',
-                    "mds_port": 31700 + allConfigs[k].loyalty_id + '',
-                    "token": allConfigs[k].beniobms.token,
-                    "build": beniobms.build
-                })
+    async getBeniobmsList() {
+        let list = [];
+        let beniobmsList = [];
+        list = await queries.getAllBeniobms();
+
+        let all = list.map( config => {
+            return config.name;
+        });
+        beniobmsList.push({
+            'beniobms' : 'all',
+            'names' : all
+        });
+
+        let locations = list.map( config => {
+            return config.location;
+        });
+        locations = Array.from(new Set(locations));
+        locations.forEach( location => {
+            let filteredList = list.filter( config => {
+                return config.location === location;
+            });
+            let namesArr = [];
+            filteredList.forEach( config => {
+                namesArr = namesArr.concat(config.name)
+            });
+            beniobmsList.push({
+                'location' : location,
+                'names' : namesArr
+            });
+        });
+
+        let placements = list.map( config => {
+            return config.beniobms.placement;
+        });
+        placements = Array.from(new Set(placements));
+        placements.forEach( placement => {
+            let filteredList = list.filter( config => {
+                return config.beniobms.placement === placement;
+            });
+            let namesArr = [];
+            filteredList.forEach( config => {
+                namesArr = namesArr.concat(config.name)
+            });
+            beniobmsList.push({
+                'placement' : placement,
+                'names' : namesArr
+            });
+        });
+        return beniobmsList;
+     },
+
+    async getBeniobmsConfig(name) {
+        let partnerConfig = await queries.getOneBeniobms(name);
+        if (!partnerConfig) {
+            return {
+                "code": 1,
+                "status": "Not found"
             }
+        } else {
+            let beniobmsConfig = {};
+            let beniobms = await queries.getDefaults('beniobms');
+            let admin_web = await queries.getDefaults('admin-web');
+            let message_delivery_service = await queries.getDefaults('message-delivery-service');
+            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.beniobms.placement);
+            let basePorts = await queries.getDefaults('baseports');
+            let basePort = basePorts.ports[partnerConfig.beniobms.placement][partnerConfig.type].port;
+            beniobmsConfig.name = name;
+            beniobmsConfig.namespace = name;
+            beniobmsConfig.address = 'https://' + partnerConfig.dns.name + '.' + partnerConfig.beniobms.subdomain + '.' + partnerConfig.dns.domain + '/';
+            beniobmsConfig.aw_port = basePort + partnerConfig.loyalty_id * 20 + admin_web.service_id;
+            beniobmsConfig.mds_port = basePort + partnerConfig.loyalty_id * 20 + message_delivery_service.service_id;
+            beniobmsConfig.deployhost = deployhost.hostname;
+            beniobmsConfig.token = partnerConfig.beniobms.token;
+            beniobmsConfig.build = beniobms.build;
+            return beniobmsConfig;
         }
-        return beniobmsData;
     },
 
     async getGiftcardwebConfigs(name) {
@@ -179,7 +237,7 @@ const methods = {
     async liquibeniobms() {
         let tasksData = [];
         let beniobmsData = [];
-        const allConfigs = await queries.getall();
+        const allConfigs = await queries.getAllBeniobms();
         const allDbPlacements = await queries.getAllDbPlacements();
         const sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
         for (let k = 0; k < allConfigs.length; k++) {
@@ -359,19 +417,47 @@ const methods = {
     },
 
     async getBmscardwebList() {
-        let webList = [];
+        let list = [];
         let bmscardwebList = [];
-        webList = await queries.getBmscardweb();
-        let placements = webList.map( config => {
+        list = await queries.getAllBmscardweb();
+
+        let namesArr = [];
+        list.map( config => {
+            namesArr = namesArr.concat(config.bmscardweb.names);
+        });
+        bmscardwebList.push({
+            'bmscardweb' : 'all',
+            'names' : namesArr
+        });
+
+        let locations = list.map( config => {
+            return config.location;
+        });
+        locations = Array.from(new Set(locations));
+        locations.forEach( location => {
+            let filteredList = list.filter( config => {
+                return config.location === location;
+            });
+            let namesArr = [];
+            filteredList.forEach( config => {
+                namesArr = namesArr.concat(config.bmscardweb.names)
+            });
+            bmscardwebList.push({
+                'location' : location,
+                'names' : namesArr
+            });
+        });
+
+        let placements = list.map( config => {
             return config.bmscardweb.placement;
         });
         placements = Array.from(new Set(placements));
         placements.forEach( placement => {
-            let filteredWebList = webList.filter( config => {
+            let filteredList = list.filter( config => {
                 return config.bmscardweb.placement === placement;
             });
             let namesArr = [];
-            filteredWebList.forEach( config => {
+            filteredList.forEach( config => {
                 namesArr = namesArr.concat(config.bmscardweb.names)
             });
             bmscardwebList.push({
@@ -382,24 +468,31 @@ const methods = {
         return bmscardwebList;
     },
 
-    async getBmscardwebConfigs(name) {
-        let webConfig = {};
-        let webData = await queries.getWebData(name);
-        let partnerConfig = await queries.getOne(name);
-        let web = await queries.getDefaults('web');
-        let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.bmscardweb.placement);
-        let basePorts = await queries.getDefaults('baseports');
-        let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
-        webConfig.name = name;
-        webConfig.namespace = name;
-        webConfig.port = basePort + partnerConfig.loyalty_id*20 + web.service_id;
-        webConfig.colorPrimary = webData.color1;
-        webConfig.colorAccent = webData.color2;
-        webConfig.deployhost = deployhost.hostname;
-        webConfig.build = web.build;
-        webConfig.description = partnerConfig.description;
-        webConfig.bmscardweburl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
-        return webConfig;
+    async getBmscardwebConfig(name) {
+        let partnerConfig = await queries.getOneBmscardweb(name);
+        if (!partnerConfig) {
+            return {
+                "code": 1,
+                "status": "Not found"
+            }
+        } else {
+            let webConfig = {};
+            let webData = await queries.getWebData(name);
+            let web = await queries.getDefaults('web');
+            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.bmscardweb.placement);
+            let basePorts = await queries.getDefaults('baseports');
+            let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
+            webConfig.name = name;
+            webConfig.namespace = name;
+            webConfig.port = basePort + partnerConfig.loyalty_id * 20 + web.service_id;
+            webConfig.colorPrimary = webData.color1;
+            webConfig.colorAccent = webData.color2;
+            webConfig.deployhost = deployhost.hostname;
+            webConfig.build = web.build;
+            webConfig.description = partnerConfig.description;
+            webConfig.bmscardweburl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
+            return webConfig;
+        }
     },
 
     async getOracleData(name) {

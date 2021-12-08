@@ -32,6 +32,50 @@ const queries = {
         return result;
     },
 
+    async getAllBeniobms() {
+        const allBeniobms = mongoose.model('allBeniobms', configsSchema, 'configs');
+        let result = await allBeniobms.find(
+            { 'beniobms' : { $exists: true} },
+            'loyalty_id type name location description database dns beniobms',
+            function (err) {
+            if (err) return console.log(err);
+        }).sort({ 'name': 1 }).lean();
+        return result;
+    },
+
+    async getOneBeniobms(name) {
+        const oneBeniobms = mongoose.model('oneBeniobms', configsSchema, 'configs');
+        let result = await oneBeniobms.findOne(
+            { 'name': name, 'beniobms' : { $exists: true} },
+            'loyalty_id type name location description database dns beniobms',
+            function (err) {
+            if (err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
+    async getAllBmscardweb() {
+        const allBmscardweb = mongoose.model('allBmscardweb', configsSchema, 'configs');
+        let result = await allBmscardweb.find(
+            { 'bmscardweb' : { $exists: true} },
+            'loyalty_id type name location description dns bmscardweb',
+            function (err) {
+                if (err) return console.log(err);
+            }).sort({ 'name': 1 }).lean();
+        return result;
+    },
+
+    async getOneBmscardweb(name) {
+        const oneBmscardweb = mongoose.model('oneBeniobms', configsSchema, 'configs');
+        let result = await oneBmscardweb.findOne(
+            { 'name': name, 'bmscardweb' : { $exists: true} },
+            'loyalty_id type name location description dns bmscardweb',
+            function (err) {
+                if (err) return console.log(err);
+            }).lean();
+        return result;
+    },
+
     async getstatsender() {
         let result = [];
         const Stats = mongoose.model('', configsSchema, 'configs');
@@ -110,14 +154,6 @@ const queries = {
                 "color2" : null
             }
         }
-        return result;
-    },
-
-    async getBmscardweb() {
-        const webList = mongoose.model('webList', configsSchema, 'configs');
-        let result = await webList.find( { 'bmscardweb' : { $exists: true } }, 'bmscardweb', function (err){
-            if(err) return console.log(err);
-        }).lean();
         return result;
     },
 

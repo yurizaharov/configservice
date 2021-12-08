@@ -86,14 +86,14 @@ router
 
     .get('/api/configs/bmscardweb/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getBmscardwebConfigs(name)
+        let result = await methods.getBmscardwebConfig(name)
         res
             .status(200)
             .send(result);
     })
 
     .get('/api/configs/beniobms', async (req, res) => {
-        let result = await methods.getbeniobmsconfigs()
+        let result = await methods.getBeniobmsList()
         res
             .status(200)
             .send(result);
@@ -101,7 +101,7 @@ router
 
     .get('/api/configs/beniobms/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getbeniobmsconfigs(name)
+        let result = await methods.getBeniobmsConfig(name)
         res
             .status(200)
             .send(result);
