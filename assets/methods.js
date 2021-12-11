@@ -14,8 +14,11 @@ const methods = {
     async getBeniobmsList() {
         let list = [];
         let beniobmsList = [];
+
+        // Getting partners configs where defined beniobms modules
         list = await queries.getAllBeniobms();
 
+        // Getting list of all partners with beniobms modules
         let all = list.map( config => {
             return config.name;
         });
@@ -24,6 +27,7 @@ const methods = {
             'names' : all
         });
 
+        // Getting all locations and putting the list of beniobms in each location
         let locations = list.map( config => {
             return config.location;
         });
@@ -42,6 +46,7 @@ const methods = {
             });
         });
 
+        // Getting all placements and putting the list of beniobms in each placement
         let placements = list.map( config => {
             return config.beniobms.placement;
         });
@@ -59,6 +64,8 @@ const methods = {
                 'names' : namesArr
             });
         });
+
+        // Returning result
         return beniobmsList;
      },
 
@@ -77,9 +84,12 @@ const methods = {
             let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.beniobms.placement);
             let basePorts = await queries.getDefaults('baseports');
             let basePort = basePorts.ports[partnerConfig.beniobms.placement][partnerConfig.type].port;
+            let beniobmsDnsName = partnerConfig.beniobms.name || partnerConfig.dns.name;
+            let beniobmsDnsSubdomain = partnerConfig.beniobms.subdomain || partnerConfig.dns.subdomain;
+            let beniobmsDnsDomain = partnerConfig.dns.domain;
             beniobmsConfig.name = name;
             beniobmsConfig.namespace = name;
-            beniobmsConfig.address = 'https://' + partnerConfig.dns.name + '.' + partnerConfig.beniobms.subdomain + '.' + partnerConfig.dns.domain + '/';
+            beniobmsConfig.address = 'https://' + beniobmsDnsName + '.' + beniobmsDnsSubdomain + '.' + beniobmsDnsDomain + '/';
             beniobmsConfig.aw_port = basePort + partnerConfig.loyalty_id * 20 + admin_web.service_id;
             beniobmsConfig.mds_port = basePort + partnerConfig.loyalty_id * 20 + message_delivery_service.service_id;
             beniobmsConfig.deployhost = deployhost.hostname;
@@ -296,7 +306,7 @@ const methods = {
             }
             if (allConfigs[k].bps) {
                 processingExt = 'https://' + dns + '/' + allConfigs[k].bps.context + '/';
-                processingInt = 'http://' + allConfigs[k].bps.placement + ':' + allConfigs[k].bps.port + '/' + allConfigs[k].bps.context + '/';
+                processingInt = 'http://' + allConfigs[k].bps.local_address + ':' + allConfigs[k].bps.local_port + '/' + allConfigs[k].bps.context + '/';
             }
             if (allConfigs[k].mobile) {
                 mobileExt = 'https://' + dns + '/' + allConfigs[k].mobile.context + '/'
@@ -419,8 +429,11 @@ const methods = {
     async getBmscardwebList() {
         let list = [];
         let bmscardwebList = [];
+
+        // Getting partners configs where defined bmscardweb module
         list = await queries.getAllBmscardweb();
 
+        // Getting list of all partners with bmscardweb module
         let namesArr = [];
         list.map( config => {
             namesArr = namesArr.concat(config.bmscardweb.names);
@@ -430,13 +443,15 @@ const methods = {
             'names' : namesArr
         });
 
+        // Getting all locations and putting the list of bmscardweb in each location
         let locations = list.map( config => {
-            return config.location;
+            return config.bmscardweb.location || config.location;
         });
         locations = Array.from(new Set(locations));
         locations.forEach( location => {
             let filteredList = list.filter( config => {
-                return config.location === location;
+                let currentLocation = config.bmscardweb.location || config.location;
+                return currentLocation === location;
             });
             let namesArr = [];
             filteredList.forEach( config => {
@@ -448,6 +463,7 @@ const methods = {
             });
         });
 
+        // Getting all placements and putting the list of beniobms in each placement
         let placements = list.map( config => {
             return config.bmscardweb.placement;
         });
@@ -465,6 +481,8 @@ const methods = {
                 'names' : namesArr
             });
         });
+
+        // Returning result
         return bmscardwebList;
     },
 
@@ -477,9 +495,10 @@ const methods = {
             }
         } else {
             let webConfig = {};
+            let currentLocation = partnerConfig.bmscardweb.location || partnerConfig.location;
             let webData = await queries.getWebData(name);
             let web = await queries.getDefaults('web');
-            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.bmscardweb.placement);
+            let deployhost = await queries.getDeployHost(currentLocation, partnerConfig.bmscardweb.placement);
             let basePorts = await queries.getDefaults('baseports');
             let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
             webConfig.name = name;
