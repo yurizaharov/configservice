@@ -3,6 +3,12 @@ const queries = require('../assets/queries');
 const oracle = require('../db/oracle');
 const fs = require('fs');
 const oracledb = require('oracledb');
+
+const notFoundError = {
+    "code": 1,
+    "status": "Not found"
+};
+
 const methods = {
 
     async getallconfigs() {
@@ -72,10 +78,7 @@ const methods = {
     async getBeniobmsConfig(name) {
         let partnerConfig = await queries.getOneBeniobms(name);
         if (!partnerConfig) {
-            return {
-                "code": 1,
-                "status": "Not found"
-            }
+            return notFoundError;
         } else {
             let beniobmsConfig = {};
             let beniobms = await queries.getDefaults('beniobms');
@@ -365,7 +368,65 @@ const methods = {
         return cardsData;
     },
 
-    async getdnsrecords(name) {
+    async getAllDnsRecords(location, providers) {
+        let allDnsRecords = [];
+        let list = await queries.getByLocation(location);
+        let locationData = await queries.getLocationData(location);
+        let processings = await queries.getDefaults('processings');
+        let beniobms = await queries.getDefaults('beniobms');
+        let web = await queries.getDefaults('web');
+        let giftcardweb = await queries.getDefaults('giftcardweb');
+        for (let x in providers) {
+            list.map( record => {
+                let state = (x > 0) ? 'add' : 'present';
+                allDnsRecords.push({
+                    "domain": record.dns.domain,
+                    "subdomain": record.dns.name + '.' + record.dns.subdomain,
+                    "type": processings.dns.type,
+                    "content": locationData.providers[providers[x]].address,
+                    "ttl": processings.dns.ttl,
+                    "state": state
+                });
+                if (record.beniobms) {
+                    let beniobmsDnsName = record.beniobms.name || record.dns.name;
+                    let beniobmsDnsSubdomain = record.beniobms.subdomain || record.dns.subdomain;
+                    allDnsRecords.push({
+                        "domain": record.dns.domain,
+                        "subdomain": beniobmsDnsName + '.' + beniobmsDnsSubdomain,
+                        "type": beniobms.dns.type,
+                        "content": locationData.providers[providers[x]].address,
+                        "ttl": beniobms.dns.ttl,
+                        "state": state
+                    });
+                }
+                if (record.giftcardweb) {
+                    let giftcardwebDnsName = record.giftcardweb.name || record.dns.name;
+                    let giftcardwebDnsSubdomain = record.giftcardweb.subdomain || record.dns.subdomain;
+                    allDnsRecords.push({
+                        "domain": record.dns.domain,
+                        "subdomain": giftcardwebDnsName + '.' + giftcardwebDnsSubdomain,
+                        "type": giftcardweb.dns.type,
+                        "content": locationData.providers[providers[x]].address,
+                        "ttl": giftcardweb.dns.ttl,
+                        "state": state
+                    });
+                }
+                if (record.bmscardweb && !record.bmscardweb.location) {
+                    allDnsRecords.push({
+                        "domain": record.dns.domain,
+                        "subdomain": record.dns.name,
+                        "type": web.dns.type,
+                        "content": locationData.providers[providers[x]].address,
+                        "ttl": web.dns.ttl,
+                        "state": state
+                    });
+                }
+            });
+        }
+        return allDnsRecords;
+    },
+
+    async getDnsConfig(name) {
         let dnsData = [];
         let allConfigs = await queries.getall(name);
         let processings = await queries.getDefaults('processings');
@@ -489,10 +550,7 @@ const methods = {
     async getBmscardwebConfig(name) {
         let partnerConfig = await queries.getOneBmscardweb(name);
         if (!partnerConfig) {
-            return {
-                "code": 1,
-                "status": "Not found"
-            }
+            return notFoundError;
         } else {
             let webConfig = {};
             let currentLocation = partnerConfig.bmscardweb.location || partnerConfig.location;

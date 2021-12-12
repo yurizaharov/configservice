@@ -147,7 +147,15 @@ router
 
     .get('/api/configs/dns/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getdnsrecords(name)
+        let result = await methods.getDnsConfig(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .post('/api/configs/dns', jsonParser, async function (req, res) {
+        if(!req.body || !req.body.location || !req.body.providers) return res.sendStatus(400);
+        let result = await methods.getAllDnsRecords(req.body.location, req.body.providers);
         res
             .status(200)
             .send(result);

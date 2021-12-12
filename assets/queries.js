@@ -76,6 +76,25 @@ const queries = {
         return result;
     },
 
+    async getByLocation(location) {
+        const Partners = mongoose.model('', configsSchema, 'configs');
+        let result = await Partners.find(
+            { 'location': location },
+            'name dns beniobms giftcardweb bmscardweb',
+            function (err) {
+                if (err) return console.log(err);
+            }).sort({ 'name': 1 }).lean();
+        return result;
+    },
+
+    async getLocationData(location) {
+      const locationData = mongoose.model('locationData', configsSchema, 'locations');
+      let result = await locationData.findOne( { 'location': location }, function (err) {
+              if (err) return console.log(err);
+          }).lean();
+      return result;
+    },
+
     async getstatsender() {
         let result = [];
         const Stats = mongoose.model('', configsSchema, 'configs');
