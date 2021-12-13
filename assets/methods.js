@@ -368,7 +368,7 @@ const methods = {
         return cardsData;
     },
 
-    async getAllDnsRecords(location, providers) {
+    async getAllDnsRecords(location) {
         let allDnsRecords = [];
         let list = await queries.getByLocation(location);
         let locationData = await queries.getLocationData(location);
@@ -376,14 +376,14 @@ const methods = {
         let beniobms = await queries.getDefaults('beniobms');
         let web = await queries.getDefaults('web');
         let giftcardweb = await queries.getDefaults('giftcardweb');
-        for (let x in providers) {
+        for (let x in locationData.working_providers) {
             list.map( record => {
                 let state = (x > 0) ? 'add' : 'present';
                 allDnsRecords.push({
                     "domain": record.dns.domain,
                     "subdomain": record.dns.name + '.' + record.dns.subdomain,
                     "type": processings.dns.type,
-                    "content": locationData.providers[providers[x]].address,
+                    "content": locationData.providers[locationData.working_providers[x]].address,
                     "ttl": processings.dns.ttl,
                     "state": state
                 });
@@ -394,7 +394,7 @@ const methods = {
                         "domain": record.dns.domain,
                         "subdomain": beniobmsDnsName + '.' + beniobmsDnsSubdomain,
                         "type": beniobms.dns.type,
-                        "content": locationData.providers[providers[x]].address,
+                        "content": locationData.providers[locationData.working_providers[x]].address,
                         "ttl": beniobms.dns.ttl,
                         "state": state
                     });
@@ -406,7 +406,7 @@ const methods = {
                         "domain": record.dns.domain,
                         "subdomain": giftcardwebDnsName + '.' + giftcardwebDnsSubdomain,
                         "type": giftcardweb.dns.type,
-                        "content": locationData.providers[providers[x]].address,
+                        "content": locationData.providers[locationData.working_providers[x]].address,
                         "ttl": giftcardweb.dns.ttl,
                         "state": state
                     });
@@ -416,7 +416,7 @@ const methods = {
                         "domain": record.dns.domain,
                         "subdomain": record.dns.name,
                         "type": web.dns.type,
-                        "content": locationData.providers[providers[x]].address,
+                        "content": locationData.providers[locationData.working_providers[x]].address,
                         "ttl": web.dns.ttl,
                         "state": state
                     });
