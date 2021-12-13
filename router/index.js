@@ -153,9 +153,9 @@ router
             .send(result);
     })
 
-    .post('/api/configs/dns', jsonParser, async function (req, res) {
-        if(!req.body || !req.body.location || !req.body.providers) return res.sendStatus(400);
-        let result = await methods.getAllDnsRecords(req.body.location, req.body.providers);
+    .get('/api/configs/dnsfailover/:location', async (req, res) => {
+        const location = req.params.location;
+        let result = await methods.getAllDnsRecords(location);
         res
             .status(200)
             .send(result);
