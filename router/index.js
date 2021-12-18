@@ -169,6 +169,21 @@ router
             .send(result);
     })
 
+    .get('/api/configs/getprojectid', async (req, res) => {
+        let result = await methods.getAllProjectIds()
+        res
+            .status(200)
+            .send(result);
+    })
+
+    .get('/api/configs/getprojectid/:name', async (req, res) => {
+        const name = req.params.name;
+        let result = await methods.getProjectId(name)
+        res
+            .status(200)
+            .send(result);
+    })
+
     .get('/api/configs/data/:name', async (req, res) => {
         const name = req.params.name;
         let result = await methods.getOracleData(name)
@@ -185,22 +200,9 @@ router
             .send(result);
     })
 
-    .post("/api/loyalty/new", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
-        let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
-        console.log(sendResult)
-        const resData = {
-            "code": 0,
-            "status": "success"
-        }
-        res
-            .status(200)
-            .send(resData);
-    })
-
     .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.name || !req.body.colorPrimary || !req.body.colorAccent) return res.sendStatus(400);
-        let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.colorPrimary, req.body.colorAccent);
+        if(!req.body || !req.body.name || !req.body.description) return res.sendStatus(400);
+        let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.description, req.body.modules);
         console.log(sendResult)
         const resData = {
             "code": 0,

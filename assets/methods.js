@@ -615,6 +615,29 @@ const methods = {
         return bundleIdData;
     },
 
+    async getAllProjectIds() {
+        const allProjectsIdData = await queries.getAllProjectsId();
+        const allProjectsId = allProjectsIdData.map( config => {
+            return {
+                "name": config.name,
+                "project_id": config.projectID
+            }
+        });
+        return allProjectsId;
+    },
+
+    async getProjectId(name) {
+        let projectIdData = await queries.getProjectId(name);
+        if (!projectIdData) {
+            return notFoundError;
+        } else {
+            return {
+                "name": name,
+                "project_id": projectIdData.projectID
+            }
+        }
+    },
+
     async usersSpace(name) {
         const sqlQuery = fs.readFileSync('./db/sql/getusersspace.sql').toString();
         const placement = await queries.getPlacement(name);

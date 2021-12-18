@@ -6,7 +6,8 @@ databasePlacement = process.env.databasePlacement || 'db3'
 
 module.exports = {
 
-    newPartner: async function (type, name, colorPrimary, colorAccent) {
+    newPartner: async function (type, name, description, modules) {
+        console.log(modules);
         let partner = {};
         let currentDate = new Date().toLocaleString('ru-RU');
         let lastId = await queries.getLastID(type);
@@ -19,7 +20,7 @@ module.exports = {
         partner.type = type;
         partner.name = name;
         partner.location = 'prod';
-        partner.description = null;
+        partner.description = description;
         partner.subscription = true;
         partner.stage = 'new';
         partner.inProd = false;

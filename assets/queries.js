@@ -153,6 +153,22 @@ const queries = {
         return result;
     },
 
+    async getAllProjectsId() {
+        const AllProjectsId = mongoose.model('projectID', configsSchema, 'configs');
+        let result = await AllProjectsId.find({ 'projectID' : { $exists: true } }, 'name projectID', function (err) {
+            if (err) return console.log(err);
+        }).sort({'name': 1}).lean();
+        return result;
+    },
+
+    async getProjectId(name) {
+        const ProjectId = mongoose.model('projectID', configsSchema, 'configs');
+        let result = await ProjectId.findOne({ 'name': name }, 'projectID', function (err) {
+            if (err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
     async getBundleIdData(name) {
         const BundleIdData = mongoose.model('bundleid', configsSchema, 'configs');
         let result = await BundleIdData.findOne( { 'mobile.bundleid' : name },'', function (err){
