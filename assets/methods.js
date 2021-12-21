@@ -202,33 +202,89 @@ const methods = {
         return bpsData;
     },
 
-    async getmobilebackconfigs(name) {
-        let mobileData = [];
-        let allConfigs = await queries.getall(name);
-        let processings = await queries.getDefaults('processings');
-        for (let k = 0; k < allConfigs.length; k++) {
-            if (allConfigs[k].mobile) {
-                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
-                let mobileExt = address + '/' + allConfigs[k].mobile.context + '/';
-                let port;
-                if (allConfigs[k].type === 'loyalty30') {
-                    port = 300 + allConfigs[k].loyalty_id + '27';
-                }
-                if (allConfigs[k].type === 'regular') {
-                    port = 100 + allConfigs[k].loyalty_id + '27';
-                }
-                mobileData.push({
-                    "name": allConfigs[k].name,
-                    "address": address,
-                    "mobileExt": mobileExt,
-                    "mobilePort": port,
-                    "mobileContext": allConfigs[k].mobile.context,
-                    "mobileToken": allConfigs[k].mobile.token,
-                    "mobileBuild": processings.build
-                });
-            }
+    async getMobilebackList() {
+        let list = [];
+        let mobilebackList = [];
+
+        // Getting partners configs where defined mobileback module
+        list = await queries.getAllMobileback();
+
+        // Getting list of all partners with mobileback module
+        let all = list.map( config => {
+            return config.name;
+        });
+        mobilebackList.push({
+            'mobileback' : 'all',
+            'names' : all
+        });
+
+        // Getting all locations and putting the list of mobileback in each location
+        let locations = list.map( config => {
+            return config.location;
+        });
+        locations = Array.from(new Set(locations));
+        locations.forEach( location => {
+            let filteredList = list.filter( config => {
+                return config.location === location;
+            });
+            let namesArr = [];
+            filteredList.forEach( config => {
+                namesArr = namesArr.concat(config.name)
+            });
+            mobilebackList.push({
+                'location' : location,
+                'names' : namesArr
+            });
+        });
+
+        // Getting all placements and putting the list of mobileback in each placement
+        let placements = list.map( config => {
+            return config.mobile.placement;
+        });
+        placements = Array.from(new Set(placements));
+        placements.forEach( placement => {
+            let filteredList = list.filter( config => {
+                return config.mobile.placement === placement;
+            });
+            let namesArr = [];
+            filteredList.forEach( config => {
+                namesArr = namesArr.concat(config.name)
+            });
+            mobilebackList.push({
+                'placement' : placement,
+                'names' : namesArr
+            });
+        });
+
+        // Returning result
+        return mobilebackList;
+    },
+
+    async getMobilebackConfig(name) {
+        let partnerConfig = await queries.getOneMobileback(name);
+        if (!partnerConfig) {
+            return notFoundError;
+        } else {
+            let mobilebackConfig = {};
+            let mobileback = await queries.getDefaults('mobileback');
+            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.mobile.placement);
+            let basePorts = await queries.getDefaults('baseports');
+            let basePort = basePorts.ports[partnerConfig.mobile.placement][partnerConfig.type].port;
+            let mobilebackDnsName = partnerConfig.mobile.name || partnerConfig.dns.name;
+            let mobilebackDnsSubdomain = partnerConfig.mobile.subdomain || partnerConfig.dns.subdomain;
+            let mobilebackDnsDomain = partnerConfig.dns.domain;
+            mobilebackConfig.name = name;
+            mobilebackConfig.namespace = name;
+            mobilebackConfig.description = partnerConfig.description;
+            mobilebackConfig.mobileAddress = 'https://' + mobilebackDnsName + '.' + mobilebackDnsSubdomain + '.' + mobilebackDnsDomain + '/';
+            mobilebackConfig.mobileExt = mobilebackConfig.mobileAddress + partnerConfig.mobile.context + '/';
+            mobilebackConfig.mobilePort = basePort + partnerConfig.loyalty_id * 20 + mobileback.service_id;
+            mobilebackConfig.mobileContext = partnerConfig.mobile.context;
+            mobilebackConfig.mobileToken = partnerConfig.mobile.token;
+            mobilebackConfig.mobileBuild = mobileback.build;
+            mobilebackConfig.mobileDeployhost = deployhost.hostname;
+            return mobilebackConfig;
         }
-        return mobileData;
     },
 
     async getstatsenderconfigs() {

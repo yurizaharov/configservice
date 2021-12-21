@@ -36,7 +36,7 @@ const queries = {
         const allBeniobms = mongoose.model('allBeniobms', configsSchema, 'configs');
         let result = await allBeniobms.find(
             { 'beniobms' : { $exists: true} },
-            'loyalty_id type name location description database dns beniobms',
+            'loyalty_id type name location description dns beniobms',
             function (err) {
             if (err) return console.log(err);
         }).sort({ 'name': 1 }).lean();
@@ -47,7 +47,7 @@ const queries = {
         const oneBeniobms = mongoose.model('oneBeniobms', configsSchema, 'configs');
         let result = await oneBeniobms.findOne(
             { 'name': name, 'beniobms' : { $exists: true} },
-            'loyalty_id type name location description database dns beniobms',
+            'loyalty_id type name location description dns beniobms',
             function (err) {
             if (err) return console.log(err);
         }).lean();
@@ -70,6 +70,28 @@ const queries = {
         let result = await oneBmscardweb.findOne(
             { 'name': name, 'bmscardweb' : { $exists: true} },
             'loyalty_id type name location description dns bmscardweb',
+            function (err) {
+                if (err) return console.log(err);
+            }).lean();
+        return result;
+    },
+
+    async getAllMobileback() {
+        const allMobileback = mongoose.model('allMobileback', configsSchema, 'configs');
+        let result = await allMobileback.find(
+            { 'mobile' : { $exists: true} },
+            'loyalty_id type name location description dns mobile',
+            function (err) {
+                if (err) return console.log(err);
+            }).sort({ 'name': 1 }).lean();
+        return result;
+    },
+
+    async getOneMobileback(name) {
+        const oneMobileback = mongoose.model('oneMobileback', configsSchema, 'configs');
+        let result = await oneMobileback.findOne(
+            { 'name': name, 'mobile' : { $exists: true} },
+            'loyalty_id type name location description dns mobile',
             function (err) {
                 if (err) return console.log(err);
             }).lean();
