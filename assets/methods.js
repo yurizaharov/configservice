@@ -221,10 +221,10 @@ const methods = {
                     "name": allConfigs[k].name,
                     "address": address,
                     "mobileExt": mobileExt,
-                    "port": port,
-                    "context": allConfigs[k].mobile.context,
-                    "token": allConfigs[k].mobile.token,
-                    "build": processings.build
+                    "mobilePort": port,
+                    "mobileContext": allConfigs[k].mobile.context,
+                    "mobileToken": allConfigs[k].mobile.token,
+                    "mobileBuild": processings.build
                 });
             }
         }
@@ -445,6 +445,7 @@ const methods = {
                         "subdomain": bpsSubdomain,
                         "type": processings.dns.type,
                         "content": processings.dns.content[i],
+                        "state": "add",
                         "ttl": processings.dns.ttl
                     })
                 }
@@ -456,6 +457,7 @@ const methods = {
                         "subdomain": beniobmsSubdomain,
                         "type": beniobms.dns.type,
                         "content": beniobms.dns.content[i],
+                        "state": "add",
                         "ttl": beniobms.dns.ttl
                     })
                 }
@@ -467,6 +469,7 @@ const methods = {
                         "subdomain": webSubdomain,
                         "type": web.dns.type,
                         "content": web.dns[allConfigs[k].type].content[i],
+                        "state": "add",
                         "ttl": web.dns.ttl
                     })
                 }
@@ -478,6 +481,7 @@ const methods = {
                         "subdomain": giftcardwebSubdomain,
                         "type": giftcardweb.dns.type,
                         "content": giftcardweb.dns.content[i],
+                        "state": "add",
                         "ttl": giftcardweb.dns.ttl
                     })
                 }
@@ -561,13 +565,13 @@ const methods = {
             let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
             webConfig.name = name;
             webConfig.namespace = name;
-            webConfig.port = basePort + partnerConfig.loyalty_id * 20 + web.service_id;
+            webConfig.bmscardwebPort = basePort + partnerConfig.loyalty_id * 20 + web.service_id;
             webConfig.colorPrimary = webData.color1;
             webConfig.colorAccent = webData.color2;
-            webConfig.deployhost = deployhost.hostname;
-            webConfig.build = web.build;
+            webConfig.bmscardwebDeployhost = deployhost.hostname;
+            webConfig.bmscardwebBuild = web.build;
             webConfig.description = partnerConfig.description;
-            webConfig.bmscardweburl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
+            webConfig.bmscardwebUrl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
             return webConfig;
         }
     },
