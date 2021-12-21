@@ -63,7 +63,7 @@ router
     })
 
     .get('/api/configs/mobileback', async (req, res) => {
-        let result = await methods.getmobilebackconfigs()
+        let result = await methods.getMobilebackList()
         res
             .status(200)
             .send(result);
@@ -71,7 +71,7 @@ router
 
     .get('/api/configs/mobileback/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getmobilebackconfigs(name)
+        let result = await methods.getMobilebackConfig(name)
         res
             .status(200)
             .send(result);
