@@ -92,12 +92,13 @@ const methods = {
             let beniobmsDnsDomain = partnerConfig.dns.domain;
             beniobmsConfig.name = name;
             beniobmsConfig.namespace = name;
-            beniobmsConfig.address = 'https://' + beniobmsDnsName + '.' + beniobmsDnsSubdomain + '.' + beniobmsDnsDomain + '/';
+            beniobmsConfig.description = partnerConfig.description;
+            beniobmsConfig.beniobmsAddress = 'https://' + beniobmsDnsName + '.' + beniobmsDnsSubdomain + '.' + beniobmsDnsDomain + '/';
             beniobmsConfig.aw_port = basePort + partnerConfig.loyalty_id * 20 + admin_web.service_id;
             beniobmsConfig.mds_port = basePort + partnerConfig.loyalty_id * 20 + message_delivery_service.service_id;
-            beniobmsConfig.deployhost = deployhost.hostname;
-            beniobmsConfig.token = partnerConfig.beniobms.token;
-            beniobmsConfig.build = beniobms.build;
+            beniobmsConfig.beniobmsDeployhost = deployhost.hostname;
+            beniobmsConfig.beniobmsToken = partnerConfig.beniobms.token;
+            beniobmsConfig.beniobmsBuild = beniobms.build;
             return beniobmsConfig;
         }
     },
@@ -200,6 +201,35 @@ const methods = {
             }
         }
         return bpsData;
+    },
+
+    async getBpsConfig(name) {
+        let partnerConfig = await queries.getOneBps(name);
+        if (!partnerConfig) {
+            return notFoundError;
+        } else {
+            let bpsConfig = {};
+            let bps = await queries.getDefaults('bps');
+            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.bps.placement);
+            let basePorts = await queries.getDefaults('baseports');
+            let basePort = basePorts.ports[partnerConfig.bps.placement][partnerConfig.type].port;
+            let bpsDnsName = partnerConfig.bps.name || partnerConfig.dns.name;
+            let bpsDnsSubdomain = partnerConfig.bps.subdomain || partnerConfig.dns.subdomain;
+            let bpsDnsDomain = partnerConfig.dns.domain;
+            bpsConfig.name = name;
+            bpsConfig.namespace = name;
+            bpsConfig.description = partnerConfig.description;
+            bpsConfig.bpsAddress = 'https://' + bpsDnsName + '.' + bpsDnsSubdomain + '.' + bpsDnsDomain + '/';
+            bpsConfig.bpsExt = bpsConfig.bpsAddress + partnerConfig.bps.context + '/';
+            bpsConfig.bpsPort = basePort + partnerConfig.loyalty_id * 20 + bps.service_id;
+            bpsConfig.bpsContext = partnerConfig.bps.context;
+            bpsConfig.bpsToken = partnerConfig.bps.token;
+            bpsConfig.bpsBuild = bps.build;
+            bpsConfig.bpsDeployhost = deployhost.hostname;
+            bpsConfig.min_card = partnerConfig.cards.min;
+            bpsConfig.max_card = partnerConfig.cards.max;
+            return bpsConfig;
+        }
     },
 
     async getMobilebackList() {

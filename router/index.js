@@ -56,7 +56,7 @@ router
 
     .get('/api/configs/bps/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getbpsconfigs(name)
+        let result = await methods.getBpsConfig(name)
         res
             .status(200)
             .send(result);

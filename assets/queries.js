@@ -98,6 +98,17 @@ const queries = {
         return result;
     },
 
+    async getOneBps(name) {
+        const oneBps = mongoose.model('oneBps', configsSchema, 'configs');
+        let result = await oneBps.findOne(
+            { 'name': name, 'bps' : { $exists: true} },
+            'loyalty_id type name location description dns bps cards',
+            function (err) {
+                if (err) return console.log(err);
+            }).lean();
+        return result;
+    },
+
     async getByLocation(location) {
         const Partners = mongoose.model('', configsSchema, 'configs');
         let result = await Partners.find(
