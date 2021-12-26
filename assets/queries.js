@@ -12,12 +12,12 @@ const queries = {
         let result = [];
         const Total = mongoose.model('', configsSchema, 'configs');
         if (!name) {
-            result = await Total.find({ 'type' : { $exists: true } }, function (err, doc) {
+            result = await Total.find({ 'type' : { $exists: true } }, function (err) {
 //            result = await Total.find( { "test" : true }, function (err, doc){
                 if (err) return console.log(err);
             }).sort({'name': 1}).lean();
         } else {
-            result = await Total.find({'name': name}, function (err, doc) {
+            result = await Total.find({'name': name}, function (err) {
                 if (err) return console.log(err);
             }).lean();
         }
@@ -36,7 +36,7 @@ const queries = {
         const allBeniobms = mongoose.model('allBeniobms', configsSchema, 'configs');
         let result = await allBeniobms.find(
             { 'beniobms' : { $exists: true} },
-            'loyalty_id type name location description dns beniobms',
+            'loyalty_id type name location description database dns beniobms',
             function (err) {
             if (err) return console.log(err);
         }).sort({ 'name': 1 }).lean();
@@ -47,7 +47,7 @@ const queries = {
         const oneBeniobms = mongoose.model('oneBeniobms', configsSchema, 'configs');
         let result = await oneBeniobms.findOne(
             { 'name': name, 'beniobms' : { $exists: true} },
-            'loyalty_id type name location description dns beniobms',
+            'loyalty_id type name location description database dns beniobms',
             function (err) {
             if (err) return console.log(err);
         }).lean();
@@ -128,10 +128,10 @@ const queries = {
       return result;
     },
 
-    async getstatsender() {
+    async getStatSender() {
         let result = [];
         const Stats = mongoose.model('', configsSchema, 'configs');
-        result = await Stats.find({ 'subscription' : false, 'inProd' : true }, function (err, doc){
+        result = await Stats.find({ 'subscription' : false, 'inProd' : true }, function (err){
             if(err) return console.log(err);
         }).sort({ 'name' : 1 }).lean();
         return result;
@@ -140,7 +140,7 @@ const queries = {
     async getcardsranges() {
         let result = [];
         const Cards = mongoose.model('', configsSchema, 'configs');
-        result = await Cards.find({ 'cards' : { $exists: true } }, function (err, doc){
+        result = await Cards.find({ 'cards' : { $exists: true } }, function (err){
             if(err) return console.log(err);
         }).sort({ 'cards.max' : 1 }).lean();
         return result;
@@ -156,7 +156,7 @@ const queries = {
 
     async getPlacement(name) {
         const Placement = mongoose.model('placement', configsSchema, 'placements');
-        let result = await Placement.findOne({ 'name' : name }, function (err){
+        let result = await Placement.findOne({ 'hostname' : name }, function (err){
             if(err) return console.log(err);
         }).lean();
         return result;
@@ -174,7 +174,7 @@ const queries = {
         const Placements = mongoose.model('alldbplacements', configsSchema, 'placements');
         let result = await Placements.find({ 'oracle_sid' : { $exists: true } }, function (err) {
             if (err) return console.log(err);
-        }).sort({'name': 1}).lean();
+        }).sort({'hostname': 1}).lean();
         return result;
     },
 
@@ -198,14 +198,6 @@ const queries = {
         const ProjectId = mongoose.model('projectID', configsSchema, 'configs');
         let result = await ProjectId.findOne({ 'name': name }, 'projectID', function (err) {
             if (err) return console.log(err);
-        }).lean();
-        return result;
-    },
-
-    async getBundleIdData(name) {
-        const BundleIdData = mongoose.model('bundleid', configsSchema, 'configs');
-        let result = await BundleIdData.findOne( { 'mobile.bundleid' : name },'', function (err){
-            if(err) return console.log(err);
         }).lean();
         return result;
     },

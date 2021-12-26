@@ -20,14 +20,14 @@ router
     })
 
     .get('/liquibeniobms', async (req, res) => {
-        let result = await methods.liquibeniobms();
+        let result = await methods.liquiBeniobms();
         res
             .status(200)
             .send(result);
     })
 
     .get('/liquiprocessing', async (req,res) => {
-        let result = await methods.liquiprocessing();
+        let result = await methods.liquiProcessing();
         res
             .status(200)
             .send(result);
@@ -41,7 +41,7 @@ router
     })
 
     .get('/api/configs/statsender', async (req, res) => {
-        let result = await methods.getstatsenderconfigs()
+        let result = await methods.getStatSenderConfigs()
         res
             .status(200)
             .send(result);
@@ -192,16 +192,8 @@ router
             .send(result);
     })
 
-    .get('/api/configs/bundleid/:name', async (req, res) => {
-        const name = req.params.name;
-        let result = await methods.getBundleIdData(name)
-        res
-            .status(200)
-            .send(result);
-    })
-
     .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.name || !req.body.description) return res.sendStatus(400);
+        if(!req.body || !req.body.name) return res.sendStatus(400);
         let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.description, req.body.modules);
         console.log(sendResult)
         const resData = {
@@ -215,7 +207,7 @@ router
 
     .post("/api/loyalty/newregular", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name) return res.sendStatus(400);
-        let sendResult = await loyalty.newPartner('regular', req.body.name);
+        let sendResult = await loyalty.newPartner('regular', req.body.name, req.body.description, req.body.modules);
         console.log(sendResult)
         const resData = {
             "code": 0,

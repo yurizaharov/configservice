@@ -2,7 +2,7 @@ const oracledb = require('oracledb');
 
 const oracle = {
 
-    async sqlrequest (initialData) {
+    async sqlRequest (initialData) {
         let connection;
         try {
             let binds, options, result;
@@ -22,6 +22,10 @@ const oracle = {
 
         } catch (err) {
             console.error(err);
+            return {
+                'name' : initialData.name,
+                'data' : ''
+            };
         } finally {
             if (connection) {
                 try {

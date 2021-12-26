@@ -2,7 +2,7 @@ const axios = require('axios');
 
 const functions = {
 
-    async getbeniobmsversion (initialData) {
+    async getBeniobmsVersion (initialData) {
         let beniobmsVersion;
         try {
             const response = await axios.get(initialData.beniobmsExt + 'actuator/info/');
@@ -16,7 +16,7 @@ const functions = {
         }
     },
 
-    async getprocessingversion (initialData) {
+    async getBpsVersion (initialData) {
         let processingVersion;
         try {
             const response = await axios.get(initialData.processingExt + 'bpsApi/ping/');

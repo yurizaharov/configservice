@@ -156,7 +156,7 @@ const methods = {
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].database) {
                 let placement = allDbPlacements.filter(obj => {
-                    return obj.name === allConfigs[k].database.placement
+                    return obj.hostname === allConfigs[k].database.host
                 });
                 placement = placement[0];
                 databaseData.push({
@@ -317,124 +317,123 @@ const methods = {
         }
     },
 
-    async getstatsenderconfigs() {
-        let statSenderConfigs = [];
-        let statSenderData = [];
-        statSenderConfigs = await queries.getstatsender();
-        for (let k = 0; k < statSenderConfigs.length; k++) {
-            let placement = await queries.getPlacement(statSenderConfigs[k].database.placement);
-            statSenderData.push({
-                "dataBase": statSenderConfigs[k].name,
-                "user": statSenderConfigs[k].database.user,
-                "password": statSenderConfigs[k].database.password,
+    async getStatSenderConfigs() {
+        const statSenderConfigs = await queries.getStatSender();
+        const allDbPlacements = await queries.getAllDbPlacements();
+        const statSenderData = statSenderConfigs.map( partner => {
+            let placement = allDbPlacements.filter( obj => {
+                return obj.hostname === partner.database.host
+            });
+            placement = placement[0];
+            return {
+                "dataBase": partner.name,
+                "user": partner.database.user,
+                "password": partner.database.password,
                 "connectString": placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
-            })
-        }
+            }
+        });
         return statSenderData;
     },
 
-    async liquibeniobms() {
-        let tasksData = [];
-        let beniobmsData = [];
+    async liquiBeniobms() {
         const allConfigs = await queries.getAllBeniobms();
         const allDbPlacements = await queries.getAllDbPlacements();
         const sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
-        for (let k = 0; k < allConfigs.length; k++) {
-            let dataBase = allConfigs[k].name;
-            let beniobmsExt;
-            if (allConfigs[k].dns) {
-                let name = allConfigs[k].beniobms.name || allConfigs[k].dns.name;
-                let subdomain = allConfigs[k].beniobms.subdomain || allConfigs[k].dns.subdomain;
-                beniobmsExt = 'https://' + name + '.' + subdomain + '.' + allConfigs[k].dns.domain + '/';
-            }
-            let placement = allDbPlacements.filter(obj => {
-                return obj.name === allConfigs[k].database.placement
+        let configs = allConfigs.map( config => {
+            let placement = allDbPlacements.filter( obj => {
+                return obj.hostname === config.database.host
             });
             placement = placement[0];
-            let initialData = {
-                'name' : dataBase,
-                'dataBase' : dataBase,
-                'user' : allConfigs[k].database.user,
-                'password' : allConfigs[k].database.password,
+            let beniobmsDnsName = config.beniobms.name || config.dns.name;
+            let beniobmsDnsSubdomain = config.beniobms.subdomain || config.dns.subdomain;
+            let beniobmsDnsDomain = config.dns.domain;
+            let beniobmsExt = 'https://' + beniobmsDnsName + '.' + beniobmsDnsSubdomain + '.' + beniobmsDnsDomain + '/';
+            return {
+                'name' : config.name,
+                'dataBase' : config.name,
+                'user' : config.database.user,
+                'password' : config.database.password,
                 'connectString' : placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
                 'beniobmsExt': beniobmsExt,
                 'sqlQuery' : sqlQuery
             }
-            tasksData.push(initialData);
-        }
-        let beniobmsVersions = await functions.parallelProcess(functions.getbeniobmsversion, tasksData);
-        let currentPatches = await functions.parallelProcess(oracle.sqlrequest, tasksData);
-        for (let k = 0; k < tasksData.length; k++) {
-            let beniobmsVersion = beniobmsVersions.filter(obj => {
-                return obj.name === tasksData[k].name
+        });
+
+        let beniobmsVersions = await functions.parallelProcess(functions.getBeniobmsVersion, configs);
+        let currentPatches = await functions.parallelProcess(oracle.sqlRequest, configs);
+
+        let beniobmsData = configs.map( config => {
+            let beniobmsVersion = beniobmsVersions.filter( obj => {
+                return obj.name === config.name
             });
-            let currentPatch = currentPatches.filter(obj => {
-                return obj.name === tasksData[k].name
+            let currentPatch = currentPatches.filter( obj => {
+                return obj.name === config.name
             });
-            beniobmsData.push({
-                dataBase: tasksData[k].name,
-                id: currentPatch[0].data.ID,
-                beniobmsVersion: beniobmsVersion[0].beniobmsVersion,
-                beniobmsExt: tasksData[k].beniobmsExt
-            });
-        }
+            return {
+                dataBase: config.name,
+                id: '' || currentPatch[0].data.ID,
+                beniobmsVersion: '' || beniobmsVersion[0].beniobmsVersion,
+                beniobmsExt: config.beniobmsExt
+            }
+        });
         return beniobmsData;
     },
 
-    async liquiprocessing() {
-        let tasksData = [];
-        let processingData = [];
+    async liquiProcessing() {
         const allConfigs = await queries.getall();
         const allDbPlacements = await queries.getAllDbPlacements();
         const sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
-        for (let k = 0; k < allConfigs.length; k++) {
-            let dataBase = allConfigs[k].name;
-            let dns, processingExt, processingInt, mobileExt;
-            if (allConfigs[k].dns) {
-                dns = allConfigs[k].dns.name + '.' + allConfigs[k].dns.subdomain + '.' + allConfigs[k].dns.domain;
-            }
-            if (allConfigs[k].bps) {
-                processingExt = 'https://' + dns + '/' + allConfigs[k].bps.context + '/';
-                processingInt = 'http://' + allConfigs[k].bps.local_address + ':' + allConfigs[k].bps.local_port + '/' + allConfigs[k].bps.context + '/';
-            }
-            if (allConfigs[k].mobile) {
-                mobileExt = 'https://' + dns + '/' + allConfigs[k].mobile.context + '/'
-            }
-            let placement = allDbPlacements.filter(obj => {
-                return obj.name === allConfigs[k].database.placement
+        let configs = allConfigs.map( config => {
+            let bpsExt, mobilebackExt;
+            let placement = allDbPlacements.filter( obj => {
+                return obj.hostname === config.database.host
             });
             placement = placement[0];
-            let initialData = {
-                'name' : dataBase,
-                'dataBase' : dataBase,
-                'user' : allConfigs[k].database.user,
-                'password' : allConfigs[k].database.password,
+            if (config.bps) {
+                let bpsDnsName = config.bps.name || config.dns.name;
+                let bpsDnsSubdomain = config.bps.subdomain || config.dns.subdomain;
+                let bpsDnsDomain = config.dns.domain;
+                let bpsDns = bpsDnsName + '.' + bpsDnsSubdomain + '.' + bpsDnsDomain;
+                bpsExt = 'https://' + bpsDns + '/' + config.bps.context + '/';
+            }
+            if (config.mobileback) {
+                let mobilebackDnsName = config.mobileback.name || config.dns.name;
+                let mobilebackDnsSubdomain = config.mobileback.subdomain || config.dns.subdomain;
+                let mobilebackDnsDomain = config.dns.domain;
+                let mobilebackDns = mobilebackDnsName + '.' + mobilebackDnsSubdomain + '.' + mobilebackDnsDomain;
+                mobilebackExt = 'https://' + mobilebackDns + '/' + config.mobileback.context + '/';
+            }
+            return {
+                'name' : config.name,
+                'dataBase' : config.name,
+                'user' : config.database.user,
+                'password' : config.database.password,
                 'connectString' : placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
-                'processingExt': processingExt,
-                'processingInt': processingInt,
-                'mobileExt': mobileExt,
+                'processingExt': bpsExt,
+                'mobileExt': mobilebackExt,
                 'sqlQuery' : sqlQuery
             }
-            tasksData.push(initialData);
-        }
-        let processingVersions = await functions.parallelProcess(functions.getprocessingversion, tasksData);
-        let currentPatches = await functions.parallelProcess(oracle.sqlrequest, tasksData);
-        for (let k = 0; k < tasksData.length; k++) {
-            let processingVersion = processingVersions.filter(obj => {
-                return obj.name === tasksData[k].name
+        });
+
+        let bpsVersions = await functions.parallelProcess(functions.getBpsVersion, configs);
+        let currentPatches = await functions.parallelProcess(oracle.sqlRequest, configs);
+
+        let processingData = configs.map( config => {
+            let bpsVersion = bpsVersions.filter( obj => {
+                    return obj.name === config.name
             });
-            let currentPatch = currentPatches.filter(obj => {
-                return obj.name === tasksData[k].name
+            let currentPatch = currentPatches.filter( obj => {
+                    return obj.name === config.name
             });
-            processingData.push({
-                dataBase: tasksData[k].name,
-                id: currentPatch[0].data.ID,
-                processingVersion: processingVersion[0].processingVersion,
-                processingExt: tasksData[k].processingExt,
-                processingInt: tasksData[k].processingInt,
-                mobileExt: tasksData[k].mobileExt
-            });
-        }
+            return {
+                dataBase: config.name,
+                id: '' || currentPatch[0].data.ID,
+                processingVersion: '' || bpsVersion[0].processingVersion,
+                processingExt: config.processingExt,
+                processingInt: config.processingInt,
+                mobileExt: config.mobileExt
+            }
+        });
         return processingData;
     },
 
@@ -692,19 +691,6 @@ const methods = {
         }
     },
 
-    async getBundleIdData(name) {
-        let bundleIdData = {};
-        let configData = await queries.getBundleIdData(name);
-        if (configData !== null) {
-            let address = 'https://' + configData.dns.name + '.' + configData.dns.subdomain + '.' + configData.dns.domain;
-            let mobileExt = address + '/' + configData.mobile.context + '/';
-            bundleIdData.name = configData.name;
-            bundleIdData.mobileExt = mobileExt;
-            bundleIdData.token = configData.mobile.token;
-        }
-        return bundleIdData;
-    },
-
     async getAllProjectIds() {
         const allProjectsIdData = await queries.getAllProjectsId();
         const allProjectsId = allProjectsIdData.map( config => {
@@ -740,7 +726,7 @@ const methods = {
             'sqlQuery' : sqlQuery
 
         }
-        let usersSpaceData = await oracle.sqlrequest(initialData, sqlQuery);
+        let usersSpaceData = await oracle.sqlRequest(initialData, sqlQuery);
         return {
             "name" : usersSpaceData.name,
             "bytes" : usersSpaceData.data.BYTES,

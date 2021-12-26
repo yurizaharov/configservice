@@ -1,26 +1,30 @@
-const functions = require('../loyalty/functions')
-const queries = require('../loyalty/queries')
+const functions = require('../loyalty/functions');
+const queries = require('../loyalty/queries');
 
 // Setting variables
-databasePlacement = process.env.databasePlacement || 'db3'
+databaseHost = process.env.databaseHost || 'db3'
 
 module.exports = {
 
     newPartner: async function (type, name, description, modules) {
         console.log(modules);
         let partner = {};
-        let currentDate = new Date().toLocaleString('ru-RU');
-        let lastId = await queries.getLastID(type);
-        let loyalty_id = lastId + 1;
-        let projectID = (loyalty_id + name).slice(0,6);
-        let user = functions.userGen(name);
-        let password = functions.passGen();
-        let procPassword = functions.passGen();
+        const currentDate = new Date().toLocaleString('ru-RU');
+        const bps = await queries.getDefaults('bps');
+        const mobileback = await queries.getDefaults('mobileback');
+        const beniobms = await queries.getDefaults('beniobms');
+        const bmscardweb = await queries.getDefaults('bmscardweb');
+        const lastId = await queries.getLastID(type);
+        const loyalty_id = lastId + 1;
+        const projectID = (loyalty_id + name).slice(0,6);
+        const user = functions.userGen(name);
+        const password = functions.passGen();
+        const procPassword = functions.passGen();
         partner.loyalty_id = loyalty_id;
         partner.type = type;
         partner.name = name;
         partner.location = 'prod';
-        partner.description = description;
+        partner.description = description || '!!! Change me !!!';
         partner.subscription = true;
         partner.stage = 'new';
         partner.inProd = false;
@@ -28,7 +32,7 @@ module.exports = {
         partner.database = {};
         partner.database.user = user;
         partner.database.password = password;
-        partner.database.placement = databasePlacement;
+        partner.database.host = databaseHost;
         partner.dns = {};
         partner.dns.domain = 'bms.group';
         partner.dns.subdomain = 'srv';
@@ -36,7 +40,7 @@ module.exports = {
         partner.bps = {};
         partner.bps.context = 'bps-' + name;
         partner.bps.token = procPassword;
-        partner.bps.subdomain = 'srv';
+        partner.bps.placement = bps.placement;
         partner.cards = {};
         if (partner.type === 'loyalty30') {
             partner.cards.min = String(8000100600000000 + partner.loyalty_id*100000);
@@ -46,18 +50,28 @@ module.exports = {
             partner.cards.min = String(8000081600000000 + partner.loyalty_id*1000000);
             partner.cards.max = String(8000081600999999 + partner.loyalty_id*1000000);
         }
-        partner.mobile = {};
-        partner.mobile.context =  'mobile-' + name;
-        partner.mobile.token = procPassword;
-        partner.mobile.subdomain = 'srv';
+        partner.mobileback = {};
+        partner.mobileback.context =  'mobile-' + name;
+        partner.mobileback.token = procPassword;
+        partner.mobileback.placement = mobileback.placement;
         partner.beniobms = {};
         partner.beniobms.token = functions.passGen();
         partner.beniobms.subdomain = 'adb';
-        partner.giftcardweb = {};
-        partner.giftcardweb.subdomain = 'gcb';
+        partner.beniobms.placement = beniobms.placement;
         partner.bmscardweb = {};
-        partner.bmscardweb.placement = 'k8s';
+        partner.bmscardweb.placement = bmscardweb.placement;
         partner.bmscardweb.names = [name];
+        if (modules.includes('giftcardweb')) {
+            const giftcardweb = await queries.getDefaults('giftcardweb');
+            partner.giftcardweb = {};
+            partner.giftcardweb.subdomain = 'gcb';
+            partner.giftcardweb.placement = giftcardweb.placement;
+        }
+        if (modules.includes('extrapayment')) {
+            const extrapayment = await queries.getDefaults('extrapayment');
+            partner.extrapayment = {};
+            partner.extrapayment.placement = extrapayment.placement;
+        }
         return await queries.savePartner(name, partner, currentDate);
     },
 

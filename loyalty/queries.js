@@ -14,7 +14,7 @@ const queries = {
     async getAll () {
         let result = [];
         const Total = mongoose.model('allConfigs', configsSchema, 'configs');
-        result = await Total.find({ 'type' : { $exists: true } }, function (err, doc) {
+        result = await Total.find({ 'type' : { $exists: true } }, function (err) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
         return result;
@@ -23,7 +23,7 @@ const queries = {
     async getLastID(type) {
         let result = [];
         const LastId = mongoose.model('getLastId', configsSchema, 'configs');
-        result = await LastId.find({ 'type' : type, 'loyalty_id' : { $exists: true } }, function (err, doc) {
+        result = await LastId.find({ 'type' : type, 'loyalty_id' : { $exists: true } }, function (err) {
             if (err) return console.log(err);
         }).sort({'loyalty_id': -1}).lean();
         if (!result[0]) {
@@ -68,6 +68,14 @@ const queries = {
                 if(err) return console.log(err);
             }).lean();
 
+        return result;
+    },
+
+    async getDefaults(purpose) {
+        const Defaults = mongoose.model('defaults', configsSchema, 'defaults');
+        let result = await Defaults.findOne({ 'purpose' : purpose }, '',function (err){
+            if(err) return console.log(err);
+        }).lean();
         return result;
     },
 

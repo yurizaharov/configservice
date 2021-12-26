@@ -14,8 +14,7 @@ const partnerSchema = new Schema({
     database: {
         user: String,
         password: String,
-        connectString: String,
-        placement: String
+        host: String
     },
     dns: {
         domain: String,
@@ -25,23 +24,28 @@ const partnerSchema = new Schema({
     bps:{
         context: String,
         token: String,
-        subdomain: String
+        placement: String
     },
     cards: {
         min: String,
         max: String
     },
-    mobile: {
+    mobileback: {
         context: String,
         token: String,
-        subdomain: String
+        placement: String
     },
     beniobms: {
         token: String,
-        subdomain: String
+        subdomain: String,
+        placement: String
+    },
+    extrapayment: {
+        placement: String
     },
     giftcardweb: {
-        subdomain: String
+        subdomain: String,
+        placement: String
     },
     bmscardweb: {
         placement: String,
