@@ -42,8 +42,7 @@ const queries = {
     },
 
     async getNewPartner () {
-        let result = [];
-        result = await Partner.findOne({ 'stage' : 'new' }, 'name', function (err){
+        let result = await Partner.findOne({ 'stage' : 'new' }, 'name', function (err){
             if(err) return console.log(err);
         }).lean();
         return result;

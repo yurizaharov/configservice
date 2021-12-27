@@ -165,7 +165,7 @@ const methods = {
                     "user": allConfigs[k].database.user,
                     "password": allConfigs[k].database.password,
                     "connectString": placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
-                    "placement": allConfigs[k].database.placement
+                    "host": allConfigs[k].database.host
                 })
             }
         }
@@ -269,12 +269,12 @@ const methods = {
 
         // Getting all placements and putting the list of mobileback in each placement
         let placements = list.map( config => {
-            return config.mobile.placement;
+            return config.mobileback.placement;
         });
         placements = Array.from(new Set(placements));
         placements.forEach( placement => {
             let filteredList = list.filter( config => {
-                return config.mobile.placement === placement;
+                return config.mobileback.placement === placement;
             });
             let namesArr = [];
             filteredList.forEach( config => {
@@ -297,20 +297,20 @@ const methods = {
         } else {
             let mobilebackConfig = {};
             let mobileback = await queries.getDefaults('mobileback');
-            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.mobile.placement);
+            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.mobileback.placement);
             let basePorts = await queries.getDefaults('baseports');
-            let basePort = basePorts.ports[partnerConfig.mobile.placement][partnerConfig.type].port;
-            let mobilebackDnsName = partnerConfig.mobile.name || partnerConfig.dns.name;
-            let mobilebackDnsSubdomain = partnerConfig.mobile.subdomain || partnerConfig.dns.subdomain;
+            let basePort = basePorts.ports[partnerConfig.mobileback.placement][partnerConfig.type].port;
+            let mobilebackDnsName = partnerConfig.mobileback.name || partnerConfig.dns.name;
+            let mobilebackDnsSubdomain = partnerConfig.mobileback.subdomain || partnerConfig.dns.subdomain;
             let mobilebackDnsDomain = partnerConfig.dns.domain;
             mobilebackConfig.name = name;
             mobilebackConfig.namespace = name;
             mobilebackConfig.description = partnerConfig.description;
             mobilebackConfig.mobileAddress = 'https://' + mobilebackDnsName + '.' + mobilebackDnsSubdomain + '.' + mobilebackDnsDomain + '/';
-            mobilebackConfig.mobileExt = mobilebackConfig.mobileAddress + partnerConfig.mobile.context + '/';
+            mobilebackConfig.mobileExt = mobilebackConfig.mobileAddress + partnerConfig.mobileback.context + '/';
             mobilebackConfig.mobilePort = basePort + partnerConfig.loyalty_id * 20 + mobileback.service_id;
-            mobilebackConfig.mobileContext = partnerConfig.mobile.context;
-            mobilebackConfig.mobileToken = partnerConfig.mobile.token;
+            mobilebackConfig.mobileContext = partnerConfig.mobileback.context;
+            mobilebackConfig.mobileToken = partnerConfig.mobileback.token;
             mobilebackConfig.mobileBuild = mobileback.build;
             mobilebackConfig.mobileDeployhost = deployhost.hostname;
             return mobilebackConfig;
@@ -457,19 +457,21 @@ const methods = {
         let allDnsRecords = [];
         let list = await queries.getByLocation(location);
         let locationData = await queries.getLocationData(location);
-        let processings = await queries.getDefaults('processings');
+        let bps = await queries.getDefaults('bps');
         let beniobms = await queries.getDefaults('beniobms');
-        let web = await queries.getDefaults('web');
+        let bmscardweb = await queries.getDefaults('bmscardweb');
         let giftcardweb = await queries.getDefaults('giftcardweb');
         for (let x in locationData.working_providers) {
             list.map( record => {
                 let state = (x > 0) ? 'add' : 'present';
+                let bpsDnsName = record.bps.name || record.dns.name;
+                let bpsDnsSubdomain = record.bps.subdomain || record.dns.subdomain;
                 allDnsRecords.push({
                     "domain": record.dns.domain,
-                    "subdomain": record.dns.name + '.' + record.dns.subdomain,
-                    "type": processings.dns.type,
+                    "subdomain": bpsDnsName + '.' + bpsDnsSubdomain,
+                    "type": bps.dns.type,
                     "content": locationData.providers[locationData.working_providers[x]].address,
-                    "ttl": processings.dns.ttl,
+                    "ttl": bps.dns.ttl,
                     "state": state
                 });
                 if (record.beniobms) {
@@ -500,9 +502,9 @@ const methods = {
                     allDnsRecords.push({
                         "domain": record.dns.domain,
                         "subdomain": record.dns.name,
-                        "type": web.dns.type,
+                        "type": bmscardweb.dns.type,
                         "content": locationData.providers[locationData.working_providers[x]].address,
-                        "ttl": web.dns.ttl,
+                        "ttl": bmscardweb.dns.ttl,
                         "state": state
                     });
                 }
@@ -512,68 +514,61 @@ const methods = {
     },
 
     async getDnsConfig(name) {
-        let dnsData = [];
-        let allConfigs = await queries.getall(name);
-        let processings = await queries.getDefaults('processings');
+        let partnerDnsRecords = [];
+        let partnerConfig = await queries.getOne(name);
+        let bps = await queries.getDefaults('bps');
         let beniobms = await queries.getDefaults('beniobms');
-        let web = await queries.getDefaults('web');
+        let bmscardweb = await queries.getDefaults('bmscardweb');
         let giftcardweb = await queries.getDefaults('giftcardweb');
-
-        for (let k = 0; k < allConfigs.length; k++) {
-            if (allConfigs[k].dns && allConfigs[k].bps && allConfigs[k].mobile && allConfigs[k].beniobms) {
-                let domain = allConfigs[k].dns.domain;
-
-                let bpsSubdomain = name + '.' + allConfigs[k].bps.subdomain;
-                for (let i = 0; i < processings.dns.content.length; i++) {
-                    dnsData.push({
-                        "domain": domain,
-                        "subdomain": bpsSubdomain,
-                        "type": processings.dns.type,
-                        "content": processings.dns.content[i],
-                        "state": "add",
-                        "ttl": processings.dns.ttl
-                    })
-                }
-
-                let beniobmsSubdomain = name + '.' + allConfigs[k].beniobms.subdomain;
-                for (let i = 0; i < beniobms.dns.content.length; i++) {
-                    dnsData.push({
-                        "domain": domain,
-                        "subdomain": beniobmsSubdomain,
-                        "type": beniobms.dns.type,
-                        "content": beniobms.dns.content[i],
-                        "state": "add",
-                        "ttl": beniobms.dns.ttl
-                    })
-                }
-
-                let webSubdomain = name;
-                for (let i = 0; i < web.dns[allConfigs[k].type].content.length; i++) {
-                    dnsData.push({
-                        "domain": domain,
-                        "subdomain": webSubdomain,
-                        "type": web.dns.type,
-                        "content": web.dns[allConfigs[k].type].content[i],
-                        "state": "add",
-                        "ttl": web.dns.ttl
-                    })
-                }
-
-                let giftcardwebSubdomain = name + '.' + allConfigs[k].giftcardweb.subdomain;
-                for (let i = 0; i < giftcardweb.dns.content.length; i++) {
-                    dnsData.push({
-                        "domain": domain,
-                        "subdomain": giftcardwebSubdomain,
-                        "type": giftcardweb.dns.type,
-                        "content": giftcardweb.dns.content[i],
-                        "state": "add",
-                        "ttl": giftcardweb.dns.ttl
-                    })
-                }
-
+        let locationData = await queries.getLocationData(partnerConfig.location);
+        for (let x in locationData.working_providers) {
+            let state = (x > 0) ? 'add' : 'present';
+            let bpsDnsName = partnerConfig.bps.name || partnerConfig.dns.name;
+            let bpsDnsSubdomain = partnerConfig.bps.subdomain || partnerConfig.dns.subdomain;
+            partnerDnsRecords.push({
+                "domain": partnerConfig.dns.domain,
+                "subdomain": bpsDnsName + '.' + bpsDnsSubdomain,
+                "type": bps.dns.type,
+                "content": locationData.providers[locationData.working_providers[x]].address,
+                "ttl": bps.dns.ttl,
+                "state": state
+            });
+            if (partnerConfig.beniobms) {
+                let beniobmsDnsName = partnerConfig.beniobms.name || partnerConfig.dns.name;
+                let beniobmsDnsSubdomain = partnerConfig.beniobms.subdomain || partnerConfig.dns.subdomain;
+                partnerDnsRecords.push({
+                    "domain": partnerConfig.dns.domain,
+                    "subdomain": beniobmsDnsName + '.' + beniobmsDnsSubdomain,
+                    "type": beniobms.dns.type,
+                    "content": locationData.providers[locationData.working_providers[x]].address,
+                    "ttl": beniobms.dns.ttl,
+                    "state": state
+                });
+            }
+            if (partnerConfig.giftcardweb) {
+                let giftcardwebDnsName = partnerConfig.giftcardweb.name || partnerConfig.dns.name;
+                let giftcardwebDnsSubdomain = partnerConfig.giftcardweb.subdomain || partnerConfig.dns.subdomain;
+                partnerDnsRecords.push({
+                    "domain": partnerConfig.dns.domain,
+                    "subdomain": giftcardwebDnsName + '.' + giftcardwebDnsSubdomain,
+                    "type": giftcardweb.dns.type,
+                    "content": locationData.providers[locationData.working_providers[x]].address,
+                    "ttl": giftcardweb.dns.ttl,
+                    "state": state
+                });
+            }
+            if (partnerConfig.bmscardweb && !partnerConfig.bmscardweb.location) {
+                partnerDnsRecords.push({
+                    "domain": partnerConfig.dns.domain,
+                    "subdomain": partnerConfig.dns.name,
+                    "type": bmscardweb.dns.type,
+                    "content": locationData.providers[locationData.working_providers[x]].address,
+                    "ttl": bmscardweb.dns.ttl,
+                    "state": state
+                });
             }
         }
-        return dnsData;
+        return partnerDnsRecords;
     },
 
     async getBmscardwebList() {
@@ -644,17 +639,17 @@ const methods = {
             let webConfig = {};
             let currentLocation = partnerConfig.bmscardweb.location || partnerConfig.location;
             let webData = await queries.getWebData(name);
-            let web = await queries.getDefaults('web');
+            let bmscardweb = await queries.getDefaults('bmscardweb');
             let deployhost = await queries.getDeployHost(currentLocation, partnerConfig.bmscardweb.placement);
             let basePorts = await queries.getDefaults('baseports');
             let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
             webConfig.name = name;
             webConfig.namespace = name;
-            webConfig.bmscardwebPort = basePort + partnerConfig.loyalty_id * 20 + web.service_id;
+            webConfig.bmscardwebPort = basePort + partnerConfig.loyalty_id * 20 + bmscardweb.service_id;
             webConfig.colorAccent = webData.color1;
             webConfig.colorPrimary = webData.color2;
             webConfig.bmscardwebDeployhost = deployhost.hostname;
-            webConfig.bmscardwebBuild = web.build;
+            webConfig.bmscardwebBuild = bmscardweb.build;
             webConfig.description = partnerConfig.description;
             webConfig.bmscardwebUrl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
             return webConfig;

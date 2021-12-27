@@ -79,8 +79,8 @@ const queries = {
     async getAllMobileback() {
         const allMobileback = mongoose.model('allMobileback', configsSchema, 'configs');
         let result = await allMobileback.find(
-            { 'mobile' : { $exists: true} },
-            'loyalty_id type name location description dns mobile',
+            { 'mobileback' : { $exists: true} },
+            'loyalty_id type name location description dns mobileback',
             function (err) {
                 if (err) return console.log(err);
             }).sort({ 'name': 1 }).lean();
@@ -90,8 +90,8 @@ const queries = {
     async getOneMobileback(name) {
         const oneMobileback = mongoose.model('oneMobileback', configsSchema, 'configs');
         let result = await oneMobileback.findOne(
-            { 'name': name, 'mobile' : { $exists: true} },
-            'loyalty_id type name location description dns mobile',
+            { 'name': name, 'mobileback' : { $exists: true} },
+            'loyalty_id type name location description dns mobileback',
             function (err) {
                 if (err) return console.log(err);
             }).lean();
@@ -113,7 +113,7 @@ const queries = {
         const Partners = mongoose.model('', configsSchema, 'configs');
         let result = await Partners.find(
             { 'location': location },
-            'name dns beniobms giftcardweb bmscardweb',
+            'name dns bps beniobms giftcardweb bmscardweb',
             function (err) {
                 if (err) return console.log(err);
             }).sort({ 'name': 1 }).lean();
@@ -162,9 +162,9 @@ const queries = {
         return result;
     },
 
-    async getProjectsInPlacement(placement) {
+    async getProjectsInPlacement(host) {
         const Projects = mongoose.model('projects', configsSchema, 'configs');
-        let result = await Projects.find({'database.placement' : placement }, function (err) {
+        let result = await Projects.find({'database.host' : host }, function (err) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
         return result;
