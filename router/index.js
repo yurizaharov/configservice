@@ -109,7 +109,7 @@ router
 
     .get('/api/configs/giftcardweb/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getGiftcardwebConfigs(name)
+        let result = await methods.getGiftcardwebConfig(name)
         res
             .status(200)
             .send(result);
@@ -117,7 +117,7 @@ router
 
     .get('/api/configs/extrapayment/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getExtrapaymentConfigs(name)
+        let result = await methods.getExtrapaymentConfig(name)
         res
             .status(200)
             .send(result);
@@ -132,7 +132,7 @@ router
 
     .get('/api/configs/database/:name', async (req, res) => {
         const name = req.params.name;
-        let result = await methods.getdatabaseconfigs(name)
+        let result = await methods.getDatabaseConfig(name)
         res
             .status(200)
             .send(result);

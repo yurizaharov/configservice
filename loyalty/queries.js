@@ -70,14 +70,6 @@ const queries = {
         return result;
     },
 
-    async getDefaults(purpose) {
-        const Defaults = mongoose.model('defaults', configsSchema, 'defaults');
-        let result = await Defaults.findOne({ 'purpose' : purpose }, '',function (err){
-            if(err) return console.log(err);
-        }).lean();
-        return result;
-    },
-
 }
 
 module.exports = queries;

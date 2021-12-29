@@ -103,50 +103,46 @@ const methods = {
         }
     },
 
-    async getGiftcardwebConfigs(name) {
-        let giftcardwebData = [];
-        let allConfigs = await queries.getall(name);
-        let giftcardweb = await queries.getDefaults('giftcardweb');
-        for (let k = 0; k < allConfigs.length; k++) {
-            if (allConfigs[k].giftcardweb) {
-                let address = 'https://' + allConfigs[k].dns.name + '.' + allConfigs[k].giftcardweb.subdomain + '.' + allConfigs[k].dns.domain + '/';
-                let port;
-                if (allConfigs[k].type === 'loyalty30') {
-                    port = 300 + allConfigs[k].loyalty_id + '47';
-                }
-                if (allConfigs[k].type === 'regular') {
-                    port = 100 + allConfigs[k].loyalty_id + '47';
-                }
-                giftcardwebData.push({
-                    "name": allConfigs[k].name,
-                    "address": address,
-                    "port": port,
-                    "build": giftcardweb.build
-                })
-            }
+    async getGiftcardwebConfig(name) {
+        let partnerConfig = await queries.getOneGiftcardweb(name);
+        if (!partnerConfig) {
+            return notFoundError;
+        } else {
+            let giftcardwebConfig = {};
+            let currentLocation = partnerConfig.giftcardweb.location || partnerConfig.location;
+            let giftcardweb = await queries.getDefaults('giftcardweb');
+            let deployhost = await queries.getDeployHost(currentLocation, partnerConfig.giftcardweb.placement);
+            let basePorts = await queries.getDefaults('baseports');
+            let basePort = basePorts.ports[partnerConfig.giftcardweb.placement][partnerConfig.type].port;
+            let giftcardwebDnsName = partnerConfig.giftcardweb.name || partnerConfig.dns.name;
+            let giftcardwebDnsSubdomain = partnerConfig.giftcardweb.subdomain || partnerConfig.dns.subdomain;
+            let giftcardwebDnsDomain = partnerConfig.dns.domain;
+            giftcardwebConfig.name = name;
+            giftcardwebConfig.namespace = name;
+            giftcardwebConfig.giftcardwebPort = basePort + partnerConfig.loyalty_id * 20 + giftcardweb.service_id;
+            giftcardwebConfig.giftcardwebDeployhost = deployhost.hostname;
+            giftcardwebConfig.giftcardwebBuild = giftcardweb.build;
+            giftcardwebConfig.giftcardwebUrl = 'https://' + giftcardwebDnsName + '.' +  giftcardwebDnsSubdomain + '.' +  giftcardwebDnsDomain + '/';
+            return giftcardwebConfig;
         }
-        return giftcardwebData;
     },
 
-    async getExtrapaymentConfigs(name) {
-        let extrapaymentData = [];
-        let allConfigs = await queries.getall(name);
-        let extrapayment = await queries.getDefaults('extrapayment');
-        for (let k = 0; k < allConfigs.length; k++) {
-            let port;
-            if (allConfigs[k].type === 'loyalty30') {
-                port = 300 + allConfigs[k].loyalty_id + '38';
-            }
-            if (allConfigs[k].type === 'regular') {
-                port = 100 + allConfigs[k].loyalty_id + '38';
-            }
-            extrapaymentData.push({
-                "name": allConfigs[k].name,
-                "port": port,
-                "build": extrapayment.build
-            })
+    async getExtrapaymentConfig(name) {
+        let partnerConfig = await queries.getOne(name);
+        if (!partnerConfig) {
+            return notFoundError;
+        } else {
+            let extrapaymentConfig = {};
+            let extrapayment = await queries.getDefaults('extrapayment');
+            let deployhost = await queries.getDeployHost(partnerConfig.location, 'swarm');
+            let basePorts = await queries.getDefaults('baseports');
+            let basePort = basePorts.ports['swarm'][partnerConfig.type].port;
+            extrapaymentConfig.name = name;
+            extrapaymentConfig.extrapaymentPort = basePort + partnerConfig.loyalty_id * 20 + extrapayment.service_id;
+            extrapaymentConfig.extrapaymentBuild = extrapayment.build;
+            extrapaymentConfig.extrapaymentDeployhost = deployhost.hostname;
+            return extrapaymentConfig;
         }
-        return extrapaymentData;
     },
 
     async getdatabaseconfigs(name) {
@@ -170,6 +166,27 @@ const methods = {
             }
         }
         return databaseData;
+    },
+
+    async getDatabaseConfig(name) {
+        let partnerConfig = await queries.getOne(name);
+        if (!partnerConfig) {
+            return notFoundError;
+        } else {
+            let databaseConfig = {};
+            const allDbPlacements = await queries.getAllDbPlacements();
+            let placement = allDbPlacements.filter(obj => {
+                return obj.hostname === partnerConfig.database.host
+            });
+            placement = placement[0];
+            databaseConfig.name = name;
+            databaseConfig.description = partnerConfig.description;
+            databaseConfig.user = partnerConfig.database.user;
+            databaseConfig.password = partnerConfig.database.password;
+            databaseConfig.connectString = placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid;
+            databaseConfig.host = partnerConfig.database.host;
+            return databaseConfig;
+        }
     },
 
     async getbpsconfigs(name) {

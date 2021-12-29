@@ -1,5 +1,6 @@
 const functions = require('../loyalty/functions');
-const queries = require('../loyalty/queries');
+const loyaltyQueries = require('../loyalty/queries');
+const assetsQueries = require('../assets/queries');
 
 // Setting variables
 databaseHost = process.env.databaseHost || 'db3'
@@ -10,11 +11,11 @@ module.exports = {
         console.log(modules);
         let partner = {};
         const currentDate = new Date().toLocaleString('ru-RU');
-        const bps = await queries.getDefaults('bps');
-        const mobileback = await queries.getDefaults('mobileback');
-        const beniobms = await queries.getDefaults('beniobms');
-        const bmscardweb = await queries.getDefaults('bmscardweb');
-        const lastId = await queries.getLastID(type);
+        const bps = await assetsQueries.getDefaults('bps');
+        const mobileback = await assetsQueries.getDefaults('mobileback');
+        const beniobms = await assetsQueries.getDefaults('beniobms');
+        const bmscardweb = await assetsQueries.getDefaults('bmscardweb');
+        const lastId = await loyaltyQueries.getLastID(type);
         const loyalty_id = lastId + 1;
         const projectID = (loyalty_id + name).slice(0,6);
         const user = functions.userGen(name);
@@ -62,27 +63,27 @@ module.exports = {
         partner.bmscardweb.placement = bmscardweb.placement;
         partner.bmscardweb.names = [name];
         if (modules.includes('giftcardweb')) {
-            const giftcardweb = await queries.getDefaults('giftcardweb');
+            const giftcardweb = await assetsQueries.getDefaults('giftcardweb');
             partner.giftcardweb = {};
             partner.giftcardweb.subdomain = 'gcb';
             partner.giftcardweb.placement = giftcardweb.placement;
         }
         if (modules.includes('extrapayment')) {
-            const extrapayment = await queries.getDefaults('extrapayment');
+            const extrapayment = await assetsQueries.getDefaults('extrapayment');
             partner.extrapayment = {};
             partner.extrapayment.placement = extrapayment.placement;
         }
-        return await queries.savePartner(name, partner, currentDate);
+        return await loyaltyQueries.savePartner(name, partner, currentDate);
     },
 
     getNewPartner: async function () {
-        return await queries.getNewPartner();
+        return await loyaltyQueries.getNewPartner();
     },
 
     getAllNames: async function () {
         let allData = [];
         let allNames = [];
-        allData = await queries.getAll();
+        allData = await loyaltyQueries.getAll();
         for (let k = 0; k < allData.length; k++) {
             if (allData[k].dns) {
                 allNames[k*2] = allData[k].dns.name;
@@ -100,7 +101,7 @@ module.exports = {
 
     updateStage: async function (name, stage) {
         let [ code, status ] = [ 1, "error" ];
-        let result = await queries.updateStage(name, stage);
+        let result = await loyaltyQueries.updateStage(name, stage);
         if (result.name === name) {
             code = 0;
             status = "success";
@@ -112,7 +113,7 @@ module.exports = {
     },
 
     getLoyaltyData: async function (name) {
-        return await queries.getLoyaltyData(name);
+        return await loyaltyQueries.getLoyaltyData(name);
     },
 
 }

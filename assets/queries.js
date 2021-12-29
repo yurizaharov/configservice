@@ -76,6 +76,17 @@ const queries = {
         return result;
     },
 
+    async getOneGiftcardweb(name) {
+        const oneGiftcardweb = mongoose.model('oneGiftcardweb', configsSchema, 'configs');
+        let result = await oneGiftcardweb.findOne(
+            { 'name': name, 'giftcardweb' : { $exists: true} },
+            'loyalty_id type name location description dns giftcardweb',
+            function (err) {
+                if (err) return console.log(err);
+            }).lean();
+        return result;
+    },
+
     async getAllMobileback() {
         const allMobileback = mongoose.model('allMobileback', configsSchema, 'configs');
         let result = await allMobileback.find(
