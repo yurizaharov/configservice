@@ -674,24 +674,22 @@ const methods = {
     },
 
     async getOracleData(name) {
-        let oracleData = [];
-        let projectNames = [];
-        let placement = await queries.getPlacement(name);
-        let projects = await queries.getProjectsInPlacement(name);
-        if (placement !== null) {
-            let oracleUrl = placement.address + ':' + placement.oracle_port + '/' + placement.oracle_sid;
-            for (let i = 0; i < projects.length; i++) {
-                projectNames[i] = projects[i].name
-            }
-            oracleData.push ({
-                "name" : name,
-                "oracle_url" : oracleUrl,
-                "oracle_sid" : placement.oracle_sid,
-                "sys_password" : placement.sys_password,
-                "projects" : projectNames
+        const placement = await queries.getPlacement(name);
+        const projects = await queries.getProjectsInPlacement(name);
+        if (!projects.length) {
+            return notFoundError;
+        } else {
+            const projectNames = projects.map( project => {
+                return project.name;
             });
+            return {
+                "name": name,
+                "oracle_url": placement.address + ':' + placement.oracle_port + '/' + placement.oracle_sid,
+                "oracle_sid": placement.oracle_sid,
+                "sys_password": placement.sys_password,
+                "projects": projectNames
+            }
         }
-        return oracleData;
     },
 
     async getLoyaltyId(name) {

@@ -1,6 +1,6 @@
 {
   "name": "configservice",
-  "version": "0.0.66",
+  "version": "0.0.67",
   "author": "Yury Zakharov",
   "license": "MIT",
   "scripts": {
