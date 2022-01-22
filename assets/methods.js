@@ -399,19 +399,28 @@ const methods = {
     async liquiProcessing() {
         const allConfigs = await queries.getall();
         const allDbPlacements = await queries.getAllDbPlacements();
+        const allLocations = await queries.getAllLocations();
         const sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
         let configs = allConfigs.map( config => {
-            let bpsExt, mobilebackExt;
+            let bpsExt, bpsInt, mobilebackExt;
             let placement = allDbPlacements.filter( obj => {
                 return obj.hostname === config.database.host
             });
             placement = placement[0];
+            let location;
+            location = allLocations.filter( obj => {
+                return obj.location === config.location
+            });
+            location = location[0];
             if (config.bps) {
                 let bpsDnsName = config.bps.name || config.dns.name;
                 let bpsDnsSubdomain = config.bps.subdomain || config.dns.subdomain;
                 let bpsDnsDomain = config.dns.domain;
                 let bpsDns = bpsDnsName + '.' + bpsDnsSubdomain + '.' + bpsDnsDomain;
                 bpsExt = 'https://' + bpsDns + '/' + config.bps.context + '/';
+                if (location.http_access) {
+                    bpsInt = 'http://' + location.http_access.local_address + ':' + location.http_access.local_port + '/' + config.bps.context + '/';
+                }
             }
             if (config.mobileback) {
                 let mobilebackDnsName = config.mobileback.name || config.dns.name;
@@ -427,6 +436,7 @@ const methods = {
                 'password' : config.database.password,
                 'connectString' : placement.local.address + ':' + placement.local.port + '/' + placement.oracle_sid,
                 'processingExt': bpsExt,
+                'processingInt': bpsInt,
                 'mobileExt': mobilebackExt,
                 'sqlQuery' : sqlQuery
             }

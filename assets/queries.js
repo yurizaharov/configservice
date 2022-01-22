@@ -131,6 +131,14 @@ const queries = {
         return result;
     },
 
+    async getAllLocations() {
+        const allLocations = mongoose.model('allLocations', configsSchema, 'locations');
+        let result = await allLocations.find( function (err) {
+            if (err) return console.log(err);
+        }).lean();
+        return result;
+    },
+
     async getLocationData(location) {
       const locationData = mongoose.model('locationData', configsSchema, 'locations');
       let result = await locationData.findOne( { 'location': location }, function (err) {
