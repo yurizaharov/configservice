@@ -1,6 +1,7 @@
 const functions = require('../loyalty/functions');
 const loyaltyQueries = require('../loyalty/queries');
 const assetsQueries = require('../assets/queries');
+const responses = require('../responses');
 
 // Setting variables
 databaseHost = process.env.databaseHost || 'db3'
@@ -114,6 +115,24 @@ module.exports = {
 
     getLoyaltyData: async function (name) {
         return await loyaltyQueries.getLoyaltyData(name);
+    },
+
+    setStatus: async function (name, action) {
+        if (!(action === 'block' || action === 'unblock')) { return responses.error102 }
+        let stage = await loyaltyQueries.getStage(name);
+        stage = stage.stage;
+        if (stage === action + 'ed' || stage === 'to_' + action) { return responses.error103 }
+        let result = await loyaltyQueries.updateStage(name, 'to_' + action);
+        if (result.name === name) {
+            responses.response201.message = "Status was changed to " + action;
+            return responses.response201;
+        } else {
+            return responses.error1;
+        }
+    },
+
+    getNewStatus: async function () {
+        return await loyaltyQueries.getNewStatus();
     },
 
 }

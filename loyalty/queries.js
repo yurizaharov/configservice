@@ -48,6 +48,25 @@ const queries = {
         return result;
     },
 
+    async getNewStatus () {
+        let result = await Partner.findOne( { $or: [{ 'stage' : 'to_block' }, { 'stage' : 'to_unblock' }] }, 'name', function (err){
+            if(err) return console.log(err);
+        }).lean();
+        console.log(result)
+        return result;
+    },
+
+    async getStage (name) {
+      const Stage = mongoose.model('getStage', updateScheme, 'configs');
+      let result = await Stage.findOne(
+          { 'name': name },
+          'stage',
+          function (err) {
+              if(err) return console.log(err);
+      }).lean();
+      return result;
+    },
+
     async updateStage (name, stage) {
         const stageUpdate = mongoose.model('updateStage', updateScheme, 'configs');
         let result = await stageUpdate.findOneAndUpdate({ 'name': name },

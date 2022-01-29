@@ -218,8 +218,24 @@ router
             .send(resData);
     })
 
+    .post("/api/loyalty/setstatus", jsonParser, async function (req,res) {
+        if(!req.body || !req.body.name || !req.body.action) return res.sendStatus(400);
+        let sendResult = await loyalty.setStatus(req.body.name, req.body.action);
+        console.log(sendResult)
+        res
+            .status(200)
+            .send(sendResult);
+    })
+
+    .get("/api/loyalty/checknewstatus", async function (req, res) {
+        let result = await loyalty.getNewStatus();
+        res
+            .status(200)
+            .send(result);
+    })
+
     .get("/api/loyalty/checknew", async function (req, res) {
-        let result = await loyalty.getNewPartner()
+        let result = await loyalty.getNewPartner();
         res
             .status(200)
             .send(result);
