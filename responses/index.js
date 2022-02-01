@@ -23,10 +23,22 @@ const responses = {
         "message": "Status already set"
     },
 
+    error104: {
+        "code": 104,
+        "status": "error",
+        "message": "Partner already exists"
+    },
+
     response201: {
         "code": 201,
         "status": "success",
         "message": "Status was changed to "
+    },
+
+    response204: {
+        "code": 204,
+        "status": "success",
+        "message": "Created new partner"
     },
 
 }

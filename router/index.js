@@ -195,33 +195,25 @@ router
     .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name) return res.sendStatus(400);
         let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.description, req.body.modules);
-        console.log(sendResult)
-        const resData = {
-            "code": 0,
-            "status": "success"
-        }
+        console.log(sendResult);
         res
             .status(200)
-            .send(resData);
+            .send(sendResult);
     })
 
     .post("/api/loyalty/newregular", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name) return res.sendStatus(400);
         let sendResult = await loyalty.newPartner('regular', req.body.name, req.body.description, req.body.modules);
-        console.log(sendResult)
-        const resData = {
-            "code": 0,
-            "status": "success"
-        }
+        console.log(sendResult);
         res
             .status(200)
-            .send(resData);
+            .send(sendResult);
     })
 
     .post("/api/loyalty/setstatus", jsonParser, async function (req,res) {
         if(!req.body || !req.body.name || !req.body.action) return res.sendStatus(400);
         let sendResult = await loyalty.setStatus(req.body.name, req.body.action);
-        console.log(sendResult)
+        console.log(sendResult);
         res
             .status(200)
             .send(sendResult);

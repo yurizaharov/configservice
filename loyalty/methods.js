@@ -1,4 +1,4 @@
-const functions = require('../loyalty/functions');
+const loyaltyFunctions = require('../loyalty/functions');
 const loyaltyQueries = require('../loyalty/queries');
 const assetsQueries = require('../assets/queries');
 const responses = require('../responses');
@@ -8,8 +8,15 @@ databaseHost = process.env.databaseHost || 'db3'
 
 module.exports = {
 
+    _checkLoyaltyExists: async function (name) {
+        return await assetsQueries.getOne(name);
+    },
+
     newPartner: async function (type, name, description, modules) {
         console.log(modules);
+        if (await this._checkLoyaltyExists(name)) {
+            return responses.error104;
+        }
         let partner = {};
         const currentDate = new Date().toLocaleString('ru-RU');
         const bps = await assetsQueries.getDefaults('bps');
@@ -19,9 +26,9 @@ module.exports = {
         const lastId = await loyaltyQueries.getLastID(type);
         const loyalty_id = lastId + 1;
         const projectID = (loyalty_id + name).slice(0,6);
-        const user = functions.userGen(name);
-        const password = functions.passGen();
-        const procPassword = functions.passGen();
+        const user = loyaltyFunctions.userGen(name);
+        const password = loyaltyFunctions.passGen();
+        const procPassword = loyaltyFunctions.passGen();
         partner.loyalty_id = loyalty_id;
         partner.type = type;
         partner.name = name;
@@ -57,7 +64,7 @@ module.exports = {
         partner.mobileback.token = procPassword;
         partner.mobileback.placement = mobileback.placement;
         partner.beniobms = {};
-        partner.beniobms.token = functions.passGen();
+        partner.beniobms.token = loyaltyFunctions.passGen();
         partner.beniobms.subdomain = 'adb';
         partner.beniobms.placement = beniobms.placement;
         partner.bmscardweb = {};
@@ -74,7 +81,8 @@ module.exports = {
             partner.extrapayment = {};
             partner.extrapayment.placement = extrapayment.placement;
         }
-        return await loyaltyQueries.savePartner(name, partner, currentDate);
+        await loyaltyQueries.savePartner(name, partner, currentDate);
+        return responses.response204;
     },
 
     getNewPartner: async function () {
