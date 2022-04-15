@@ -1,6 +1,6 @@
 {
   "name": "configservice",
-  "version": "0.0.70",
+  "version": "0.0.71",
   "author": "Yury Zakharov",
   "license": "MIT",
   "scripts": {
@@ -8,10 +8,10 @@
     "start": "export LD_LIBRARY_PATH=/opt/oracle/instantclient_21_1:$LD_LIBRARY_PATH && node index.js"
   },
   "dependencies": {
-    "axios": "^0.25.0",
-    "express": "^4.17.2",
+    "axios": "^0.26.1",
+    "express": "^4.17.3",
     "fs": "^0.0.1-security",
-    "mongoose": "^5.13.9",
+    "mongoose": "^5.13.14",
     "oracledb": "^5.3.0",
     "passfather": "^3.0.3",
     "vue": "^2.6.14"

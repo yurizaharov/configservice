@@ -14,7 +14,11 @@ const queries = {
     async getAll () {
         let result = [];
         const Total = mongoose.model('allConfigs', configsSchema, 'configs');
-        result = await Total.find({ 'type' : { $exists: true } }, function (err) {
+        result = await Total.find({
+            $or: [
+                {'type': 'regular'},
+                {'type': 'loyalty30'}
+            ]}, function (err) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
         return result;

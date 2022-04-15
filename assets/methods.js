@@ -13,7 +13,7 @@ const methods = {
 
     async getallconfigs() {
         let allData = [];
-        allData = await queries.getall();
+        allData = await queries.getAll();
         return allData;
     },
 
@@ -147,7 +147,7 @@ const methods = {
 
     async getdatabaseconfigs(name) {
         let databaseData = [];
-        const allConfigs = await queries.getall(name);
+        const allConfigs = await queries.getAll(name);
         const allDbPlacements = await queries.getAllDbPlacements();
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].database) {
@@ -191,7 +191,7 @@ const methods = {
 
     async getbpsconfigs(name) {
         let bpsData = [];
-        let allConfigs = await queries.getall(name);
+        let allConfigs = await queries.getAll(name);
         let processings = await queries.getDefaults('processings');
         for (let k = 0; k < allConfigs.length; k++) {
             if (allConfigs[k].bps) {
@@ -308,30 +308,36 @@ const methods = {
     },
 
     async getMobilebackConfig(name) {
-        let partnerConfig = await queries.getOneMobileback(name);
-        if (!partnerConfig) {
+        let parentConfig, childConfig;
+        let config = await queries.getOneMobileback(name);
+        if (!config) {
             return notFoundError;
+        } else if (!config.coalition) {
+            childConfig = config;
+            parentConfig = config;
         } else {
-            let mobilebackConfig = {};
-            let mobileback = await queries.getDefaults('mobileback');
-            let deployhost = await queries.getDeployHost(partnerConfig.location, partnerConfig.mobileback.placement);
-            let basePorts = await queries.getDefaults('baseports');
-            let basePort = basePorts.ports[partnerConfig.mobileback.placement][partnerConfig.type].port;
-            let mobilebackDnsName = partnerConfig.mobileback.name || partnerConfig.dns.name;
-            let mobilebackDnsSubdomain = partnerConfig.mobileback.subdomain || partnerConfig.dns.subdomain;
-            let mobilebackDnsDomain = partnerConfig.dns.domain;
-            mobilebackConfig.name = name;
-            mobilebackConfig.namespace = name;
-            mobilebackConfig.description = partnerConfig.description;
-            mobilebackConfig.mobileAddress = 'https://' + mobilebackDnsName + '.' + mobilebackDnsSubdomain + '.' + mobilebackDnsDomain + '/';
-            mobilebackConfig.mobileExt = mobilebackConfig.mobileAddress + partnerConfig.mobileback.context + '/';
-            mobilebackConfig.mobilePort = basePort + partnerConfig.loyalty_id * 20 + mobileback.service_id;
-            mobilebackConfig.mobileContext = partnerConfig.mobileback.context;
-            mobilebackConfig.mobileToken = partnerConfig.mobileback.token;
-            mobilebackConfig.mobileBuild = mobileback.build;
-            mobilebackConfig.mobileDeployhost = deployhost.hostname;
-            return mobilebackConfig;
+            childConfig = config;
+            parentConfig = await queries.getOneMobileback(config.coalition.name);
         }
+        let mobilebackConfig = {};
+        let mobileback = await queries.getDefaults('mobileback');
+        let deployhost = await queries.getDeployHost(parentConfig.location, parentConfig.mobileback.placement);
+        let basePorts = await queries.getDefaults('baseports');
+        let basePort = basePorts.ports[parentConfig.mobileback.placement][parentConfig.type].port;
+        let mobilebackDnsName = parentConfig.mobileback.name || parentConfig.dns.name;
+        let mobilebackDnsSubdomain = parentConfig.mobileback.subdomain || parentConfig.dns.subdomain;
+        let mobilebackDnsDomain = parentConfig.dns.domain;
+        mobilebackConfig.name = name;
+        mobilebackConfig.namespace = parentConfig.name;
+        mobilebackConfig.description = childConfig.description;
+        mobilebackConfig.mobileAddress = 'https://' + mobilebackDnsName + '.' + mobilebackDnsSubdomain + '.' + mobilebackDnsDomain + '/';
+        mobilebackConfig.mobileExt = mobilebackConfig.mobileAddress + childConfig.mobileback.context || parentConfig.mobileback.context + '/';
+        mobilebackConfig.mobilePort = childConfig.mobileback.port || basePort + parentConfig.loyalty_id * 20 + mobileback.service_id;
+        mobilebackConfig.mobileContext = childConfig.mobileback.context || parentConfig.mobileback.context;
+        mobilebackConfig.mobileToken = childConfig.mobileback.token || parentConfig.mobileback.token;
+        mobilebackConfig.mobileBuild = mobileback.build;
+        mobilebackConfig.mobileDeployhost = deployhost.hostname;
+        return mobilebackConfig;
     },
 
     async getStatSenderConfigs() {
@@ -397,7 +403,7 @@ const methods = {
     },
 
     async liquiProcessing() {
-        const allConfigs = await queries.getall();
+        const allConfigs = await queries.getAll();
         const allDbPlacements = await queries.getAllDbPlacements();
         const allLocations = await queries.getAllLocations();
         const sqlQuery = fs.readFileSync('./db/sql/getpatch.sql').toString();
@@ -606,13 +612,12 @@ const methods = {
         list = await queries.getAllBmscardweb();
 
         // Getting list of all partners with bmscardweb module
-        let namesArr = [];
-        list.map( config => {
-            namesArr = namesArr.concat(config.bmscardweb.names);
+        let all = list.map( config => {
+            return config.name;
         });
         bmscardwebList.push({
             'bmscardweb' : 'all',
-            'names' : namesArr
+            'names' : all
         });
 
         // Getting all locations and putting the list of bmscardweb in each location
@@ -627,7 +632,7 @@ const methods = {
             });
             let namesArr = [];
             filteredList.forEach( config => {
-                namesArr = namesArr.concat(config.bmscardweb.names)
+                namesArr = namesArr.concat(config.bmscardweb.name)
             });
             bmscardwebList.push({
                 'location' : location,
@@ -646,7 +651,7 @@ const methods = {
             });
             let namesArr = [];
             filteredList.forEach( config => {
-                namesArr = namesArr.concat(config.bmscardweb.names)
+                namesArr = namesArr.concat(config.bmscardweb.name)
             });
             bmscardwebList.push({
                 'placement' : placement,
@@ -659,28 +664,35 @@ const methods = {
     },
 
     async getBmscardwebConfig(name) {
-        let partnerConfig = await queries.getOneBmscardweb(name);
-        if (!partnerConfig) {
+        let parentConfig, childConfig;
+        let config = await queries.getOneBmscardweb(name);
+        if (!config) {
             return notFoundError;
+        } else if (!config.coalition) {
+            childConfig = config;
+            parentConfig = config;
         } else {
-            let webConfig = {};
-            let currentLocation = partnerConfig.bmscardweb.location || partnerConfig.location;
-            let webData = await queries.getWebData(name);
-            let bmscardweb = await queries.getDefaults('bmscardweb');
-            let deployhost = await queries.getDeployHost(currentLocation, partnerConfig.bmscardweb.placement);
-            let basePorts = await queries.getDefaults('baseports');
-            let basePort = basePorts.ports[partnerConfig.bmscardweb.placement][partnerConfig.type].port;
-            webConfig.name = name;
-            webConfig.namespace = name;
-            webConfig.bmscardwebPort = basePort + partnerConfig.loyalty_id * 20 + bmscardweb.service_id;
-            webConfig.colorAccent = webData.color1;
-            webConfig.colorPrimary = webData.color2;
-            webConfig.bmscardwebDeployhost = deployhost.hostname;
-            webConfig.bmscardwebBuild = bmscardweb.build;
-            webConfig.description = partnerConfig.description;
-            webConfig.bmscardwebUrl = 'https://' + partnerConfig.bmscardweb.names[0] + '.' + partnerConfig.dns.domain;
-            return webConfig;
+            childConfig = config;
+            parentConfig = await queries.getOneBmscardweb(config.coalition.name);
         }
+        let webConfig = {};
+        let currentLocation = childConfig.bmscardweb.location || parentConfig.location;
+        let currentPlacement = childConfig.bmscardweb.placement || parentConfig.placement;
+        let webData = await queries.getWebData(name);
+        let bmscardweb = await queries.getDefaults('bmscardweb');
+        let deployhost = await queries.getDeployHost(currentLocation, currentPlacement);
+        let basePorts = await queries.getDefaults('baseports');
+        let basePort = basePorts.ports[parentConfig.bmscardweb.placement][parentConfig.type].port;
+        webConfig.name = name;
+        webConfig.namespace = parentConfig.name;
+        webConfig.description = childConfig.description;
+        webConfig.colorAccent = webData.color1;
+        webConfig.colorPrimary = webData.color2;
+        webConfig.bmscardwebUrl = 'https://' + childConfig.bmscardweb.name + '.' + parentConfig.dns.domain;
+        webConfig.bmscardwebPort = childConfig.bmscardweb.port || basePort + parentConfig.loyalty_id * 20 + bmscardweb.service_id;
+        webConfig.bmscardwebBuild = bmscardweb.build;
+        webConfig.bmscardwebDeployhost = deployhost.hostname;
+        return webConfig;
     },
 
     async getOracleData(name) {

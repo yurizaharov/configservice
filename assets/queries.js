@@ -5,22 +5,19 @@ const Schema = mongoose.Schema;
 
 const configsSchema = new Schema();
 
-
 const queries = {
 
-    async getall (name) {
+    async getAll () {
         let result = [];
-        const Total = mongoose.model('', configsSchema, 'configs');
-        if (!name) {
-            result = await Total.find({ 'type' : { $exists: true } }, function (err) {
-//            result = await Total.find( { "test" : true }, function (err, doc){
-                if (err) return console.log(err);
-            }).sort({'name': 1}).lean();
-        } else {
-            result = await Total.find({'name': name}, function (err) {
-                if (err) return console.log(err);
-            }).lean();
-        }
+        const Total = mongoose.model('getAll', configsSchema, 'configs');
+        result = await Total.find({
+            $or: [
+                {'type': 'regular'},
+                {'type': 'loyalty30'}
+            ]}, function (err) {
+//        result = await Total.find( { "test" : true }, function (err, doc){
+            if (err) return console.log(err);
+        }).sort({'name': 1}).lean();
         return result;
     },
 
@@ -69,7 +66,7 @@ const queries = {
         const oneBmscardweb = mongoose.model('oneBeniobms', configsSchema, 'configs');
         let result = await oneBmscardweb.findOne(
             { 'name': name, 'bmscardweb' : { $exists: true} },
-            'loyalty_id type name location description dns bmscardweb',
+            'loyalty_id type name location description dns bmscardweb coalition',
             function (err) {
                 if (err) return console.log(err);
             }).lean();
@@ -102,7 +99,7 @@ const queries = {
         const oneMobileback = mongoose.model('oneMobileback', configsSchema, 'configs');
         let result = await oneMobileback.findOne(
             { 'name': name, 'mobileback' : { $exists: true} },
-            'loyalty_id type name location description dns mobileback',
+            'loyalty_id type name location description dns mobileback coalition',
             function (err) {
                 if (err) return console.log(err);
             }).lean();
