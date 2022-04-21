@@ -99,7 +99,7 @@ const queries = {
         const oneMobileback = mongoose.model('oneMobileback', configsSchema, 'configs');
         let result = await oneMobileback.findOne(
             { 'name': name, 'mobileback' : { $exists: true} },
-            'loyalty_id type name location description dns mobileback coalition',
+            'loyalty_id type name location description dns mobileback coalition projectID',
             function (err) {
                 if (err) return console.log(err);
             }).lean();
@@ -146,7 +146,7 @@ const queries = {
 
     async getStatSender() {
         let result = [];
-        const Stats = mongoose.model('', configsSchema, 'configs');
+        const Stats = mongoose.model('statSender', configsSchema, 'configs');
         result = await Stats.find({ 'subscription' : false, 'inProd' : true }, function (err){
             if(err) return console.log(err);
         }).sort({ 'name' : 1 }).lean();
@@ -212,7 +212,7 @@ const queries = {
 
     async getProjectId(name) {
         const ProjectId = mongoose.model('projectID', configsSchema, 'configs');
-        let result = await ProjectId.findOne({ 'name': name }, 'projectID', function (err) {
+        let result = await ProjectId.findOne({ 'name': name }, 'description projectID', function (err) {
             if (err) return console.log(err);
         }).lean();
         return result;

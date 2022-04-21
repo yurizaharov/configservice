@@ -335,6 +335,7 @@ const methods = {
         mobilebackConfig.mobilePort = childConfig.mobileback.port || basePort + parentConfig.loyalty_id * 20 + mobileback.service_id;
         mobilebackConfig.mobileContext = childConfig.mobileback.context || parentConfig.mobileback.context;
         mobilebackConfig.mobileToken = childConfig.mobileback.token || parentConfig.mobileback.token;
+        mobilebackConfig.projectID = parentConfig.projectID;
         mobilebackConfig.mobileBuild = mobileback.build;
         mobilebackConfig.mobileDeployhost = deployhost.hostname;
         return mobilebackConfig;
@@ -741,6 +742,7 @@ const methods = {
         } else {
             return {
                 "name": name,
+                "description": projectIdData.description,
                 "project_id": projectIdData.projectID
             }
         }
