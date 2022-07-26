@@ -180,7 +180,7 @@ const queries = {
 
     async getProjectsInPlacement(host) {
         const Projects = mongoose.model('projects', configsSchema, 'configs');
-        let result = await Projects.find({'database.host' : host }, 'name',function (err) {
+        let result = await Projects.find({'database.host' : host, 'coalition' : { $exists: false } }, 'name',function (err) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
         return result;
