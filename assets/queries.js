@@ -1,15 +1,23 @@
-require('../db/mongodb');
 const mongoose = require('mongoose');
-const loyaltyConn = require('../db/mongodb');
 const Schema = mongoose.Schema;
+const mongoConn = require('./db/mongodb');
 
 const configsSchema = new Schema();
+
+// loyalty30 Enabled/Disabled
+loyalty30 = process.env.LOYALTY_30 || 'Enabled'
+
+let loyaltyConn;
+
+if (loyalty30 === 'Enabled') {
+    loyaltyConn = require('../loyalty/db/mongodb');
+}
 
 const queries = {
 
     async getAll () {
         let result = [];
-        const Total = mongoose.model('getAll', configsSchema, 'configs');
+        const Total = mongoConn.model('getAll', configsSchema, 'configs');
         result = await Total.find({
             $or: [
                 {'type': 'regular'},
@@ -22,7 +30,7 @@ const queries = {
     },
 
     async getOne (name) {
-        const Config = mongoose.model('getOne', configsSchema, 'configs');
+        const Config = mongoConn.model('getOne', configsSchema, 'configs');
         let result = await Config.findOne({'name': name}, function (err) {
             if (err) return console.log(err);
         }).lean();
@@ -30,7 +38,7 @@ const queries = {
     },
 
     async getAllBeniobms() {
-        const allBeniobms = mongoose.model('allBeniobms', configsSchema, 'configs');
+        const allBeniobms = mongoConn.model('allBeniobms', configsSchema, 'configs');
         let result = await allBeniobms.find(
             { 'beniobms' : { $exists: true} },
             'loyalty_id type name location description database dns beniobms',
@@ -41,7 +49,7 @@ const queries = {
     },
 
     async getOneBeniobms(name) {
-        const oneBeniobms = mongoose.model('oneBeniobms', configsSchema, 'configs');
+        const oneBeniobms = mongoConn.model('oneBeniobms', configsSchema, 'configs');
         let result = await oneBeniobms.findOne(
             { 'name': name, 'beniobms' : { $exists: true} },
             'loyalty_id type name location description database dns beniobms',
@@ -52,7 +60,7 @@ const queries = {
     },
 
     async getAllBmscardweb() {
-        const allBmscardweb = mongoose.model('allBmscardweb', configsSchema, 'configs');
+        const allBmscardweb = mongoConn.model('allBmscardweb', configsSchema, 'configs');
         let result = await allBmscardweb.find(
             { 'bmscardweb' : { $exists: true} },
             'loyalty_id type name location description dns bmscardweb',
@@ -63,7 +71,7 @@ const queries = {
     },
 
     async getOneBmscardweb(name) {
-        const oneBmscardweb = mongoose.model('oneBeniobms', configsSchema, 'configs');
+        const oneBmscardweb = mongoConn.model('oneBeniobms', configsSchema, 'configs');
         let result = await oneBmscardweb.findOne(
             { 'name': name, 'bmscardweb' : { $exists: true} },
             'loyalty_id type name location description dns bmscardweb coalition',
@@ -74,7 +82,7 @@ const queries = {
     },
 
     async getOneGiftcardweb(name) {
-        const oneGiftcardweb = mongoose.model('oneGiftcardweb', configsSchema, 'configs');
+        const oneGiftcardweb = mongoConn.model('oneGiftcardweb', configsSchema, 'configs');
         let result = await oneGiftcardweb.findOne(
             { 'name': name, 'giftcardweb' : { $exists: true} },
             'loyalty_id type name location description dns giftcardweb',
@@ -85,7 +93,7 @@ const queries = {
     },
 
     async getAllMobileback() {
-        const allMobileback = mongoose.model('allMobileback', configsSchema, 'configs');
+        const allMobileback = mongoConn.model('allMobileback', configsSchema, 'configs');
         let result = await allMobileback.find(
             { 'mobileback' : { $exists: true} },
             'loyalty_id type name location description dns mobileback',
@@ -96,7 +104,7 @@ const queries = {
     },
 
     async getOneMobileback(name) {
-        const oneMobileback = mongoose.model('oneMobileback', configsSchema, 'configs');
+        const oneMobileback = mongoConn.model('oneMobileback', configsSchema, 'configs');
         let result = await oneMobileback.findOne(
             { 'name': name, 'mobileback' : { $exists: true} },
             'loyalty_id type name location description dns mobileback coalition projectID',
@@ -107,7 +115,7 @@ const queries = {
     },
 
     async getOneBps(name) {
-        const oneBps = mongoose.model('oneBps', configsSchema, 'configs');
+        const oneBps = mongoConn.model('oneBps', configsSchema, 'configs');
         let result = await oneBps.findOne(
             { 'name': name, 'bps' : { $exists: true} },
             'loyalty_id type name location description dns bps cards',
@@ -118,7 +126,7 @@ const queries = {
     },
 
     async getByLocation(location) {
-        const Partners = mongoose.model('', configsSchema, 'configs');
+        const Partners = mongoConn.model('', configsSchema, 'configs');
         let result = await Partners.find(
             { 'location': location },
             'name dns bps beniobms giftcardweb bmscardweb',
@@ -129,7 +137,7 @@ const queries = {
     },
 
     async getAllLocations() {
-        const allLocations = mongoose.model('allLocations', configsSchema, 'locations');
+        const allLocations = mongoConn.model('allLocations', configsSchema, 'locations');
         let result = await allLocations.find( function (err) {
             if (err) return console.log(err);
         }).lean();
@@ -137,7 +145,7 @@ const queries = {
     },
 
     async getLocationData(location) {
-      const locationData = mongoose.model('locationData', configsSchema, 'locations');
+      const locationData = mongoConn.model('locationData', configsSchema, 'locations');
       let result = await locationData.findOne( { 'location': location }, function (err) {
               if (err) return console.log(err);
           }).lean();
@@ -146,7 +154,7 @@ const queries = {
 
     async getStatSender() {
         let result = [];
-        const Stats = mongoose.model('statSender', configsSchema, 'configs');
+        const Stats = mongoConn.model('statSender', configsSchema, 'configs');
         result = await Stats.find({ 'subscription' : false, 'inProd' : true }, function (err){
             if(err) return console.log(err);
         }).sort({ 'name' : 1 }).lean();
@@ -155,7 +163,7 @@ const queries = {
 
     async getcardsranges() {
         let result = [];
-        const Cards = mongoose.model('', configsSchema, 'configs');
+        const Cards = mongoConn.model('', configsSchema, 'configs');
         result = await Cards.find({ 'cards' : { $exists: true } }, function (err){
             if(err) return console.log(err);
         }).sort({ 'cards.max' : 1 }).lean();
@@ -163,7 +171,7 @@ const queries = {
     },
 
     async getDefaults(purpose) {
-        const Defaults = mongoose.model('defaults', configsSchema, 'defaults');
+        const Defaults = mongoConn.model('defaults', configsSchema, 'defaults');
         let result = await Defaults.findOne({ 'purpose' : purpose }, '',function (err){
             if(err) return console.log(err);
         }).lean();
@@ -171,7 +179,7 @@ const queries = {
     },
 
     async getPlacement(name) {
-        const Placement = mongoose.model('placement', configsSchema, 'placements');
+        const Placement = mongoConn.model('placement', configsSchema, 'placements');
         let result = await Placement.findOne({ 'hostname' : name }, function (err){
             if(err) return console.log(err);
         }).lean();
@@ -179,7 +187,7 @@ const queries = {
     },
 
     async getProjectsInPlacement(host) {
-        const Projects = mongoose.model('projects', configsSchema, 'configs');
+        const Projects = mongoConn.model('projects', configsSchema, 'configs');
         let result = await Projects.find({'database.host' : host, 'coalition' : { $exists: false } }, 'name',function (err) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
@@ -187,7 +195,7 @@ const queries = {
     },
 
     async getAllDbPlacements() {
-        const Placements = mongoose.model('alldbplacements', configsSchema, 'placements');
+        const Placements = mongoConn.model('alldbplacements', configsSchema, 'placements');
         let result = await Placements.find({ 'oracle_sid' : { $exists: true } }, function (err) {
             if (err) return console.log(err);
         }).sort({'hostname': 1}).lean();
@@ -195,7 +203,7 @@ const queries = {
     },
 
     async getLoyaltyId(name) {
-        const LoyaltyId = mongoose.model('loyalty_id', configsSchema, 'configs');
+        const LoyaltyId = mongoConn.model('loyalty_id', configsSchema, 'configs');
         let result = await LoyaltyId.findOne({ 'name' : name }, 'loyalty_id type', function (err){
             if(err) return console.log(err);
         }).lean();
@@ -203,7 +211,7 @@ const queries = {
     },
 
     async getAllProjectsId() {
-        const AllProjectsId = mongoose.model('projectID', configsSchema, 'configs');
+        const AllProjectsId = mongoConn.model('projectID', configsSchema, 'configs');
         let result = await AllProjectsId.find({ 'projectID' : { $exists: true } }, 'name projectID', function (err) {
             if (err) return console.log(err);
         }).sort({'name': 1}).lean();
@@ -211,7 +219,7 @@ const queries = {
     },
 
     async getProjectId(name) {
-        const ProjectId = mongoose.model('projectID', configsSchema, 'configs');
+        const ProjectId = mongoConn.model('projectID', configsSchema, 'configs');
         let result = await ProjectId.findOne({ 'name': name }, 'description projectID', function (err) {
             if (err) return console.log(err);
         }).lean();
@@ -219,22 +227,27 @@ const queries = {
     },
 
     async getWebData(name) {
-        const loyaltyData = loyaltyConn.model('getWebData', configsSchema, 'users');
-        let result = await loyaltyData.findOne({ 'site': name }, 'color1 color2 name', function (err){
-            if(err) return console.log(err);
-        }).lean();
-        if (!result) {
-            return {
-                'name' : null,
-                'color1' : null,
-                "color2" : null
+        let webData = {
+            'name' : name,
+            'color1' : null,
+            'color2' : null
+        };
+        if (loyalty30 === 'Enabled') {
+            const loyaltyData = loyaltyConn.model('getWebData', configsSchema, 'users');
+            let result = await loyaltyData.findOne({'site': name}, 'color1 color2 name', function (err) {
+                if (err) return console.log(err);
+            }).lean();
+            if (!result) {
+                console.log(`Data for bmscardweb ${name} was not found in loyalty database`)
+            } else {
+                webData = result;
             }
         }
-        return result;
+        return webData;
     },
 
     async readInfrastructure(location, placement, role) {
-        const infrastructureData = mongoose.model('infrastructure', configsSchema, 'infrastructure');
+        const infrastructureData = mongoConn.model('infrastructure', configsSchema, 'infrastructure');
         let result = await infrastructureData.find( { 'location': location, 'belongs': placement }, function (err){
             if(err) return console.log(err);
         }).lean();
@@ -242,7 +255,7 @@ const queries = {
     },
 
     async getDeployHost(location, placement) {
-        const Placement = mongoose.model('placement', configsSchema, 'placements');
+        const Placement = mongoConn.model('placement', configsSchema, 'placements');
         let result = await Placement.findOne(
             { 'deployhost' : true, 'location' : location, 'placement' : placement },
             'hostname',

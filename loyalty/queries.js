@@ -1,7 +1,6 @@
-require('../db/mongodb');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const loyaltyConn = require('../db/mongodb');
+const loyaltyConn = require('./db/mongodb');
 const partnerSchema = require('../db/schemes/partner');
 
 const Partner = mongoose.model('Partner', partnerSchema, 'configs');
