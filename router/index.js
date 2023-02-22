@@ -2,7 +2,6 @@ const express = require('express');
 const jsonParser = express.json();
 const router = express.Router();
 const methods = require('../assets/methods')
-const loyalty = require('../loyalty/methods')
 
 router
     .use(function timeLog(req, res, next) {
@@ -187,70 +186,6 @@ router
     .get('/api/configs/data/:name', async (req, res) => {
         const name = req.params.name;
         let result = await methods.getOracleData(name)
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.name) return res.sendStatus(400);
-        let sendResult = await loyalty.newPartner('loyalty30', req.body.name, req.body.description, req.body.modules);
-        console.log(sendResult);
-        res
-            .status(200)
-            .send(sendResult);
-    })
-
-    .post("/api/loyalty/newregular", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.name) return res.sendStatus(400);
-        let sendResult = await loyalty.newPartner('regular', req.body.name, req.body.description, req.body.modules);
-        console.log(sendResult);
-        res
-            .status(200)
-            .send(sendResult);
-    })
-
-    .post("/api/loyalty/setstatus", jsonParser, async function (req,res) {
-        if(!req.body || !req.body.name || !req.body.action) return res.sendStatus(400);
-        let sendResult = await loyalty.setStatus(req.body.name, req.body.action);
-        console.log(sendResult);
-        res
-            .status(200)
-            .send(sendResult);
-    })
-
-    .get("/api/loyalty/checknewstatus", async function (req, res) {
-        let result = await loyalty.getNewStatus();
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .get("/api/loyalty/checknew", async function (req, res) {
-        let result = await loyalty.getNewPartner();
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .get("/api/loyalty/getallnames", async function (req, res) {
-        let result = await loyalty.getAllNames()
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .post("/api/loyalty/deployment", jsonParser, async function (req, res) {
-        if(!req.body || !req.body.stage || !req.body.name) return res.sendStatus(400);
-        let result = await loyalty.updateStage(req.body.name, req.body.stage);
-        res
-            .status(200)
-            .send(result);
-    })
-
-    .get("/api/loyalty/data/:name", async function (req, res) {
-        const name = req.params.name;
-        let result = await loyalty.getLoyaltyData(name)
         res
             .status(200)
             .send(result);

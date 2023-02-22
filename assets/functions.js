@@ -8,7 +8,7 @@ const functions = {
             const response = await axios.get(initialData.beniobmsExt + 'actuator/info/');
             beniobmsVersion = response.data.app.version;
         } catch (err) {
-            console.log(err)
+            console.log(`Error getting beniobms version of ${initialData.name}: ${err.response.status} ${err.response.statusText}`);
         }
         return {
             'name' : initialData.name,
@@ -22,7 +22,7 @@ const functions = {
             const response = await axios.get(initialData.processingExt + 'bpsApi/ping/');
             processingVersion = response.data.split(' ')[1];
         } catch (err) {
-            console.log(err)
+            console.log(`Error getting bps version of ${initialData.name}: ${err.response.status} ${err.response.statusText}`);
         }
         return {
             'name' : initialData.name,

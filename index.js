@@ -1,9 +1,16 @@
 const express = require('express');
 
 const app = express();
-const router = require('./router');
 
+loyalty30 = process.env.LOYALTY_30 || 'Enabled'
+
+const router = require('./router');
 app.use(router);
+
+if (loyalty30 === 'Enabled') {
+    const loyaltyRouter = require('./router/loyalty30')
+    app.use(loyaltyRouter);
+}
 
 app.use(express.static('public'));
 
