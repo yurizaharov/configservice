@@ -4,6 +4,9 @@ const app = express();
 
 loyalty30 = process.env.LOYALTY_30 || 'Enabled'
 
+const metrics = require('./router/metrics');
+app.use(metrics);
+
 const router = require('./router');
 app.use(router);
 
