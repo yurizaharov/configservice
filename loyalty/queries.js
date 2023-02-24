@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const loyaltyConn = require('./db/mongodb');
+const mongoConn = require('../assets/db/mongodb');
 const partnerSchema = require('../db/schemes/partner');
 
-const Partner = mongoose.model('Partner', partnerSchema, 'configs');
+const Partner = mongoConn.model('Partner', partnerSchema, 'configs');
 
 const configsSchema = new Schema();
 const updateScheme = new Schema();
@@ -11,24 +12,21 @@ const updateScheme = new Schema();
 const queries = {
 
     async getAll () {
-        let result = [];
-        const Total = mongoose.model('allConfigs', configsSchema, 'configs');
-        result = await Total.find({
+        const Total = mongoConn.model('allConfigs', configsSchema, 'configs');
+        return await Total.find({
             $or: [
-                {'type': 'regular'},
-                {'type': 'loyalty30'}
-            ]}, function (err) {
-            if (err) return console.log(err);
-        }).sort({'name': 1}).lean();
-        return result;
+                { 'type': 'regular' },
+                { 'type': 'loyalty30' }
+            ]
+        }).sort({ 'name': 1 }).lean();
     },
 
     async getLastID(type) {
-        let result = [];
-        const LastId = mongoose.model('getLastId', configsSchema, 'configs');
-        result = await LastId.find({ 'type' : type, 'loyalty_id' : { $exists: true } }, function (err) {
-            if (err) return console.log(err);
-        }).sort({'loyalty_id': -1}).lean();
+        const LastId = mongoConn.model('getLastId', configsSchema, 'configs');
+        let result = await LastId.find({
+            'type': type,
+            'loyalty_id': { $exists: true }
+          }).sort({ 'loyalty_id': -1 }).lean();
         if (!result[0]) {
             return 0;
         } else {
@@ -38,58 +36,55 @@ const queries = {
 
     async savePartner (name, partner, currentDate) {
         let newpartner = new Partner(partner);
-        newpartner.save(function (err) {
-            if (err) return console.log(err);
-            console.log(currentDate, '- Saved new partner:', name);
-        });
+        newpartner.save();
+        console.log(currentDate, '- Saved new partner:', name);
     },
 
     async getNewPartner () {
-        let result = await Partner.findOne({ 'stage' : 'new' }, 'name', function (err){
-            if(err) return console.log(err);
-        }).lean();
-        return result;
+        return await Partner.findOne({
+            'stage': 'new'
+          },
+            'name'
+        ).lean();
     },
 
     async getNewStatus () {
-        let result = await Partner.findOne( { $or: [{ 'stage' : 'to_block' }, { 'stage' : 'to_unblock' }] }, 'name', function (err){
-            if(err) return console.log(err);
-        }).lean();
-        console.log(result)
-        return result;
+        return await Partner.findOne({
+            $or: [
+                { 'stage': 'to_block' },
+                { 'stage': 'to_unblock' }
+            ]
+          },
+            'name'
+        ).lean();
     },
 
     async getStage (name) {
-      const Stage = mongoose.model('getStage', updateScheme, 'configs');
-      let result = await Stage.findOne(
-          { 'name': name },
-          'stage',
-          function (err) {
-              if(err) return console.log(err);
-      }).lean();
-      return result;
+      const Stage = mongoConn.model('getStage', updateScheme, 'configs');
+      return await Stage.findOne({
+          'name': name
+        },
+          'stage'
+      ).lean();
     },
 
     async updateStage (name, stage) {
-        const stageUpdate = mongoose.model('updateStage', updateScheme, 'configs');
-        let result = await stageUpdate.findOneAndUpdate({ 'name': name },
-            {'stage': stage},
-            {
+        const stageUpdate = mongoConn.model('updateStage', updateScheme, 'configs');
+        return await stageUpdate.findOneAndUpdate(
+            { 'name': name },
+            { 'stage': stage },
+          {
             strict: false,
             new: true,
             upsert: true
-            }).lean();
-
-        return result;
+          }).lean();
     },
 
     async getLoyaltyData (name) {
         const loyaltyData = loyaltyConn.model('getLoyaltyData', configsSchema, 'users');
-        let result = await loyaltyData.findOne({ 'site': name }, '', function (err){
-                if(err) return console.log(err);
-            }).lean();
-
-        return result;
+        return await loyaltyData.findOne({
+            'site': name
+          }).lean();
     },
 
 }
