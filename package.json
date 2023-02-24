@@ -1,6 +1,6 @@
 {
   "name": "configservice",
-  "version": "0.0.76",
+  "version": "1.0.1",
   "author": "Yury Zakharov",
   "license": "MIT",
   "scripts": {
@@ -11,10 +11,10 @@
     "axios": "^1.3.3",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
-    "mongoose": "^5.13.15",
+    "mongoose": "^6.9.2",
     "oracledb": "^5.5.0",
     "passfather": "^3.0.3",
     "prom-client": "^14.1.1",
-    "vue": "^2.7.0"
+    "vue": "^2.7.14"
   }
 }

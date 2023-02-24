@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const options = require('../../db/mongodboptions')
 
+mongoose.set('strictQuery', false);
+
 // Setting variables
 loyaltyMongoAddr = process.env.LOYALTY_MONGO_ADDR || '192.168.4.231'
 loyaltyDBS = process.env.LOYALTY_DBS || 'loyalty'
