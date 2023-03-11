@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('./common/logger');
 
 const app = express();
 
@@ -18,6 +19,6 @@ if (loyalty30 === 'Enabled') {
 app.use(express.static('public'));
 
 app.listen(8080, (err) => {
-    if (err) console.log(err);
-    console.log('Server has been started');
+    if (err) logger.error(err);
+    logger.info('Server has been started');
 });

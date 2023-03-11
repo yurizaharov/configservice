@@ -2,6 +2,7 @@ const loyaltyFunctions = require('../loyalty/functions');
 const loyaltyQueries = require('../loyalty/queries');
 const assetsQueries = require('../assets/queries');
 const responses = require('../responses');
+const logger = require("../common/logger");
 
 // Setting variables
 databaseHost = process.env.databaseHost || 'db3'
@@ -13,12 +14,11 @@ module.exports = {
     },
 
     newPartner: async function (type, name, description, modules) {
-        console.log(modules);
+        logger.info(modules);
         if (await this._checkLoyaltyExists(name)) {
             return responses.error104;
         }
         let partner = {};
-        const currentDate = new Date().toLocaleString('ru-RU');
         const bps = await assetsQueries.getDefaults('bps');
         const mobileback = await assetsQueries.getDefaults('mobileback');
         const beniobms = await assetsQueries.getDefaults('beniobms');
@@ -81,7 +81,7 @@ module.exports = {
             partner.extrapayment = {};
             partner.extrapayment.placement = extrapayment.placement;
         }
-        await loyaltyQueries.savePartner(name, partner, currentDate);
+        await loyaltyQueries.savePartner(name, partner);
         return responses.response204;
     },
 

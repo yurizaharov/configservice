@@ -2,12 +2,12 @@ const express = require('express');
 const jsonParser = express.json();
 const router = express.Router();
 const methods = require('../assets/methods')
+const logger = require('../common/logger');
 
 router
     .use(function timeLog(req, res, next) {
         if(req.url !== "/ping") {
-            const currentDate = new Date().toLocaleString('ru-RU');
-            console.log (currentDate, '-', req.connection.remoteAddress.split(':')[3], '-', req.url)
+            logger.info('%s - %s', req.headers['x-real-ip'], req.url);
         }
         next();
     })

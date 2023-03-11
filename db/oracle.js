@@ -1,4 +1,5 @@
 const oracledb = require('oracledb');
+const logger = require('../common/logger');
 
 const oracle = {
 
@@ -21,7 +22,7 @@ const oracle = {
             };
 
         } catch (err) {
-            console.error(err);
+            logger.error(err);
             return {
                 'name' : initialData.name,
                 'data' : ''
@@ -31,7 +32,7 @@ const oracle = {
                 try {
                     await connection.close();
                 } catch (err) {
-                    console.error(err);
+                    logger.error(err);
                 }
             }
         }

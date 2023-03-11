@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const loyaltyConn = require('./db/mongodb');
 const mongoConn = require('../assets/db/mongodb');
+const logger = require('../common/logger');
 const partnerSchema = require('../db/schemes/partner');
 
 const Partner = mongoConn.model('Partner', partnerSchema, 'configs');
@@ -34,10 +35,10 @@ const queries = {
         }
     },
 
-    async savePartner (name, partner, currentDate) {
+    async savePartner (name, partner) {
         let newpartner = new Partner(partner);
         newpartner.save();
-        console.log(currentDate, '- Saved new partner:', name);
+        logger.info('Saved new partner: %s', name);
     },
 
     async getNewPartner () {
