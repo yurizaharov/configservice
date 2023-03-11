@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoConn = require('./db/mongodb');
+const logger = require('../common/logger');
 const configsSchema = new Schema();
 
 // loyalty30 Enabled/Disabled
@@ -218,7 +219,7 @@ const queries = {
                 'color1 color2 name'
             ).lean();
             if (!result) {
-                console.log(`Data for bmscardweb ${name} was not found in loyalty database`)
+                logger.warn('Data for bmscardweb %s was not found in loyalty database', name)
             } else {
                 webData = result;
             }

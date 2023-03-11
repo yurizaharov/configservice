@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const options = require('../../db/mongodboptions')
+const logger = require('../../common/logger');
 
 mongoose.set('strictQuery', false);
 
@@ -9,7 +10,7 @@ mongoDBS = process.env.MONGO_DBS || 'ConfigService'
 
 // Setting instance parameters
 const mongoUri = `mongodb://${mongoAddr}/${mongoDBS}`;
-console.log('MongoDB address set to:', mongoUri);
+logger.info('MongoDB address set to: %s', mongoUri);
 
 const mongoConn = mongoose.createConnection(mongoUri, options);
 module.exports = mongoConn;

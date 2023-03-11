@@ -1,6 +1,6 @@
 {
   "name": "configservice",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "author": "Yury Zakharov",
   "license": "MIT",
   "scripts": {
@@ -14,6 +14,8 @@
     "mongoose": "^6.9.2",
     "oracledb": "^5.5.0",
     "passfather": "^3.0.3",
+    "pino": "^8.11.0",
+    "pino-pretty": "^9.3.0",
     "prom-client": "^14.1.1",
     "vue": "^2.7.14"
   }

@@ -2,12 +2,12 @@ const express = require('express');
 const jsonParser = express.json();
 const loyaltyRouter = express.Router();
 const loyalty30 = require('../loyalty/methods')
+const logger = require('../common/logger');
 
 loyaltyRouter
     .use(function timeLog(req, res, next) {
         if(req.url !== "/ping") {
-            const currentDate = new Date().toLocaleString('ru-RU');
-            console.log (currentDate, '-', req.connection.remoteAddress.split(':')[3], '-', req.url)
+            logger.info('%s - %s', req.headers['x-real-ip'], req.url);
         }
         next();
     })
@@ -15,7 +15,7 @@ loyaltyRouter
     .post("/api/loyalty/newloyalty30", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name) return res.sendStatus(400);
         let sendResult = await loyalty30.newPartner('loyalty30', req.body.name, req.body.description, req.body.modules);
-        console.log(sendResult);
+        logger.info(sendResult);
         res
             .status(200)
             .send(sendResult);
@@ -24,7 +24,7 @@ loyaltyRouter
     .post("/api/loyalty/newregular", jsonParser, async function (req, res) {
         if(!req.body || !req.body.name) return res.sendStatus(400);
         let sendResult = await loyalty30.newPartner('regular', req.body.name, req.body.description, req.body.modules);
-        console.log(sendResult);
+        logger.info(sendResult);
         res
             .status(200)
             .send(sendResult);
@@ -33,7 +33,7 @@ loyaltyRouter
     .post("/api/loyalty/setstatus", jsonParser, async function (req,res) {
         if(!req.body || !req.body.name || !req.body.action) return res.sendStatus(400);
         let sendResult = await loyalty30.setStatus(req.body.name, req.body.action);
-        console.log(sendResult);
+        logger.info(sendResult);
         res
             .status(200)
             .send(sendResult);
